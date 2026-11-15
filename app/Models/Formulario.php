@@ -8,7 +8,7 @@ class Formulario extends Model
 {
     protected $table = 'formulario';
     protected $primaryKey = 'id_formulario';
-    public $timestamps = false; // Tu tabla no usa created_at/updated_at
+    public $timestamps = false; // La tabla no usa created_at/updated_at
 
     protected $fillable = [
         'nom_lugar',
@@ -16,21 +16,21 @@ class Formulario extends Model
         'actividad',
         'carrera',
         'materia',
-        'id_coordinador_avala',
-        'id_coordinador_realiza',
+        'id_coordinador_avala', // quitar
+        'id_coordinador_realiza', //quitar
         'id_solicitante',
-        'id_operador_confirma',
+        'id_operador_confirma', //quitar
     ];
 
     public function fechas()
-    {
-        return $this->hasMany(FechasFormulario::class, 'id_formulario', 'id_formulario');
+    { //referencia a modelo fechas
+        return $this->hasMany(FechasFormulario::class, 'id_formulario', 'id_formulario'); 
     }
 
     public function estudiantes()
     {
         return $this->belongsToMany(
-            Estudiante::class,
+            Estudiante::class, //referencia a modelo Estudiantes
             'nomina_estudiantes',
             'id_formulario',
             'dni_estudiante'
@@ -40,7 +40,7 @@ class Formulario extends Model
     public function profesores()
     {
         return $this->belongsToMany(
-            Profesor::class,
+            Profesor::class, //referencia a modelo Profesor
             'nomina_profesores',
             'id_formulario',
             'dni_profesor'

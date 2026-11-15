@@ -11,4 +11,4 @@ Route::get('/', function () {
 Route::get('/', [FormularioController::class, 'create']);
 
 // Recibir y procesar los datos del formulario
-Route::post('/solicitar-seguro', [FormularioController::class, 'store'])->name('formulario.store');
+Route::post('/solicitar-seguro', [FormularioController::class, 'store'])->name('Formulario.store');
