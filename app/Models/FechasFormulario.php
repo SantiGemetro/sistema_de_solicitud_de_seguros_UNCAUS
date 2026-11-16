@@ -12,7 +12,17 @@ class FechasFormulario extends Model
 
     protected $fillable = [
         'id_formulario',
-        'fecha_inicio',
-        'fecha_fin',
+        'fecha',
+        'hora_inicio',
+        'hora_fin'
     ];
+
+    public function formulario()
+    {
+        return $this->belongsTo(
+            Formulario::class,
+            'id_formulario',
+            'id_formulario'
+        );
+    }
 }

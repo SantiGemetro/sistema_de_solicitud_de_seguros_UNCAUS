@@ -41,7 +41,15 @@ class FormularioController extends Controller
                     'estado'         => 'pendiente', // Definido automáticamente por el sistema
                 ]);
 
-                // 3) Procesar y vincular Profesores
+                // 3) Procesar y vincular fechas
+                foreach ($request->fechas as $fecha) {
+                    $formulario->fechas()->create([
+                        'fecha' => $fecha['fecha'],
+                        'hora_inicio' => $fecha['hora_inicio'],
+                        'hora_fin' => $fecha['hora_fin']
+                    ]);
+                }
+                // 4) Procesar y vincular Profesores
                 foreach ($request->profesores as $profesorData) { //para cada profesor
                     $profesor = Profesor::updateOrCreate( //buscar o crear en BD (por DNI)
                         ['dni_profesor' => $profesorData[1]],
@@ -53,7 +61,7 @@ class FormularioController extends Controller
                     $formulario->profesores()->attach( $profesor[1]); //relaciona el dni
                 }
 
-                // 4) Procesar y vincular Estudiantes (mismo proceso que para profes)
+                // 5) Procesar y vincular Estudiantes (mismo proceso que para profes)
                 foreach ($request->estudiantes as $estudianteData) {
                     $estudiante = Estudiante::updateOrCreate(
                         ['dni_estudiante' => $estudianteData[1]],
@@ -69,7 +77,7 @@ class FormularioController extends Controller
                 // relaciones belongToMany declaradas en el FormularioCotroller y en los controllers de estudiante, 
                 // profe y fechas tmb ! ! !
 
-                // 5) Redireccionar con éxito 
+                // 6) Redireccionar con éxito 
                 return redirect()->route('Formulario.create') //redirect es un metodo get, por eso lo mandamos a esta ruta
                                 ->with('success', 'Formulario enviado correctamente, estado: pendiente');
             });

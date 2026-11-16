@@ -542,6 +542,12 @@
         {
             initialView: "dayGridMonth",
             locale: "es",
+            //para que no se puedan seleccionar fechas anteriores a la actual
+            validRange: function(nowDate) {
+                return {
+                    start: nowDate
+                };
+            },
 
             selectable: true,
             unselectAuto: true,
@@ -552,10 +558,6 @@
                 today: "Hoy",
                 month: "Mes"
             },
-
-            /* dateClick: function(info) {
-                alternarFecha(info.dateStr);
-            }, */
 
             dateClick: function(info) {
                 console.count("dateClick ejecutado");
@@ -774,6 +776,5 @@
         });
 
     </script>
-
 </body>
 </html>
