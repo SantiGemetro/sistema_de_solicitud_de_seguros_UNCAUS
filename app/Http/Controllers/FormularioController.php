@@ -31,7 +31,7 @@ class FormularioController extends Controller
                 );
 
                 // 2) Crear el Formulario principal
-                $formulario = formulario::create([
+                $formulario = $solicitante->formularios()->create([ //ahora crea el form para el slicitante
                     'materia'        => $request->materia,
                     'actividad'      => $request->actividad,
                     'carrera'        => $request->carrera,
@@ -42,7 +42,6 @@ class FormularioController extends Controller
                 ]);
 
                 // 3) Procesar y vincular Profesores
-                //$profesoresDnis = []; //crear variable lista vacia
                 foreach ($request->profesores as $profesorData) { //para cada profesor
                     $profesor = Profesor::updateOrCreate( //buscar o crear en BD (por DNI)
                         ['dni_profesor' => $profesorData[1]],
@@ -52,13 +51,9 @@ class FormularioController extends Controller
                         ]
                     );
                     $formulario->profesores()->attach( $profesor[1]); //relaciona el dni
-                    //$profesoresDnis[] = $profesor->dni_profesor; //agregarlo a la lista
                 }
-                // Sincroniza la relación en la tabla pivote 'nomina_profesores'
-                //$formulario->profesores()->sync($profesoresDnis);
 
                 // 4) Procesar y vincular Estudiantes (mismo proceso que para profes)
-                //$estudiantesDnis = [];
                 foreach ($request->estudiantes as $estudianteData) {
                     $estudiante = Estudiante::updateOrCreate(
                         ['dni_estudiante' => $estudianteData[1]],
@@ -68,17 +63,14 @@ class FormularioController extends Controller
                         ]
                     );
                     $formulario->estudiantes()->attach($estudiante[1]); //relaciona el dni
-                    //$estudiantesDnis[] = $estudiante->dni_estudiante;
                 }
-                // Sincroniza la relación en la tabla pivote 'nomina_estudiantes'
-                //$formulario->estudiantes()->sync($estudiantesDnis);
 
                 //! ! ! Para que funcionen las sincronizaciones(attach) de estudiantes y profes tienen que estar las 
                 // relaciones belongToMany declaradas en el FormularioCotroller y en los controllers de estudiante, 
                 // profe y fechas tmb ! ! !
 
                 // 5) Redireccionar con éxito 
-                return redirect()->route('Formulario.store')
+                return redirect()->route('Formulario.create') //redirect es un metodo get, por eso lo mandamos a esta ruta
                                 ->with('success', 'Formulario enviado correctamente, estado: pendiente');
             });
         }catch(\Exception $e){

@@ -281,7 +281,6 @@
             <input type="email"
                 name="correo_solicitante"
                 id="correo_solicitante"
-                pattern=".+@example\.com" 
                 size="30"
                 required>
         </div>
