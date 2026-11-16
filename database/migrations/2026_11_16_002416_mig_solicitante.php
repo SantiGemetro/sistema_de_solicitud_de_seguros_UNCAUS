@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('fechas_formulario', function (Blueprint $table) {
-            //
+        Schema::table('solicitante', function (Blueprint $table) {
+            $table->renameColumn('correo', 'correo_solicitante');
+            $table->string('correo_solicitante', 255)->unique();
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('fechas_formulario', function (Blueprint $table) {
-            //
+        Schema::table('solicitante', function (Blueprint $table) {
+            $table->renameColumn('correo_solicitante', 'correo');
         });
     }
 };

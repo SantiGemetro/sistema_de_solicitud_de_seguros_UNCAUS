@@ -13,4 +13,13 @@ class Estudiante extends Model
     public $timestamps = false;
 
     protected $fillable = ['dni_estudiante', 'nombre', 'domicilio'];
+    public function formularios()
+    {
+        return $this->belongsToMany(
+            Formulario::class,
+            'nomina_estudiantes',
+            'dni_estudiante',
+            'id_formulario'
+        );
+    }
 }

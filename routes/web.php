@@ -3,10 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormularioController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 // Mostrar el formulario de solicitud
 Route::get('/', [FormularioController::class, 'create']);
 

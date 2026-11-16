@@ -1,4 +1,14 @@
 
+@if ($errors->any())
+    <div style="background-color: #ffcccc; color: #990000; padding: 15px; margin-bottom: 20px; border: 1px solid #cc0000;">
+        <strong>¡Atención! Hay errores de validación:</strong>
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -264,13 +274,15 @@
         <!-- CORREO -->
 
         <div class="campo">
-            <label for="email">
+            <label for="correo_solicitante">
                 Indíquenos su correo electrónico para mantenerlo informado
             </label>
 
             <input type="email"
-                name="email"
-                id="email"
+                name="correo_solicitante"
+                id="correo_solicitante"
+                pattern=".+@example\.com" 
+                size="30"
                 required>
         </div>
 
@@ -760,7 +772,6 @@
             }
             document.getElementById("estudiantes").value = JSON.stringify(obtenerFilas("tabla-estudiantes"));
             document.getElementById("profesores").value = JSON.stringify(obtenerFilas("tabla-profesores"));
-
         });
 
     </script>

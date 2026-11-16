@@ -10,5 +10,14 @@ class Solicitante extends Model
     protected $primaryKey = 'idsolicitante';
     public $timestamps = false;
 
-    protected $fillable = ['correo'];
+    protected $fillable = ['correo_solicitante'];
+    //relacion con el formulario
+    public function formularios()
+    {
+        return $this->hasMany( //puede tener varios forms
+            Formulario::class,
+            'id_solicitante', 
+            'id_solicitante'
+        );
+    }
 }

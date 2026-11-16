@@ -16,20 +16,26 @@ class Formulario extends Model
         'actividad',
         'carrera',
         'materia',
-        'id_coordinador_avala', // quitar
-        'id_coordinador_realiza', //quitar
         'id_solicitante',
-        'id_operador_confirma', //quitar
+        'estado', //nuevo
     ];
 
+    public function solicitante()
+    {
+        return $this->belongsTo( //pertenece a solo un solicitante
+            Solicitante::class,
+            'id_solicitante',
+            'id_solicitante'
+        );
+    }
     public function fechas()
-    { //referencia a modelo fechas
+    { //referencia a modelo fechas, 1 from tiene varias fechas
         return $this->hasMany(FechasFormulario::class, 'id_formulario', 'id_formulario'); 
     }
 
     public function estudiantes()
     {
-        return $this->belongsToMany(
+        return $this->belongsToMany( 
             Estudiante::class, //referencia a modelo Estudiantes
             'nomina_estudiantes',
             'id_formulario',
@@ -40,10 +46,10 @@ class Formulario extends Model
     public function profesores()
     {
         return $this->belongsToMany(
-            Profesor::class, //referencia a modelo Profesor
-            'nomina_profesores',
-            'id_formulario',
-            'dni_profesor'
+            Profesor::class, //referencia a modelo Profesor (El modelo con el que se relaciona)
+            'nomina_profesores', //La tabla pivote (intermedia) en la BD
+            'id_formulario', //La FK en la pivote que apunta a ESTE modelo (Formulario)
+            'dni_profesor' //La FK en la pivote que apunta al OTRO modelo (Profesor)
         );
     }
 }
