@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+// use App\Models\User;
+use App\Models\Operador;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,11 +16,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        Operador::updateOrCreate(
+            ['correo' => 'op1@gmail.com'],
+            [
+                'nombre' => 'op1',
+                'contraseña' => 'op123',
+            ]
+        );
     }
 }

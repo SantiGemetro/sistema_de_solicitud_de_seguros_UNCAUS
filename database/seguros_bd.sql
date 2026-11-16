@@ -121,6 +121,14 @@ CREATE TABLE `operador_de_be` (
   `correo` varchar(155) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
+--
+-- Volcado de datos para la tabla `operador_de_be`
+--
+
+INSERT INTO `operador_de_be` (`id_operador_de_BE`, `contraseña`, `nombre`, `correo`) VALUES
+(1, 'op123', 'op1', 'op1@gmail.com');
+
+
 -- --------------------------------------------------------
 
 --

@@ -1,0 +1,284 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #222;
+    background: #fff;
+}
+
+/* ENCABEZADO */
+
+header {
+    height: 110px;
+    background: #414d51;
+    border-top: 28px solid #189bd0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    color: white;
+}
+
+header h1 {
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.logo-placeholder {
+    width: 170px;
+    height: 65px;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ddd;
+    font-size: 13px;
+}
+
+/* FORMULARIO */
+
+main {
+    max-width: 1120px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.campo {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d4d4d4;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #189bd0;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+input:disabled {
+    background: #eee;
+    cursor: not-allowed;
+}
+
+/* BUSCADOR DE MATERIAS */
+
+.materia-container {
+    position: relative;
+}
+
+#resultados-materia {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    z-index: 10;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.opcion-materia {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.opcion-materia:hover {
+    background: #eaf6fc;
+}
+
+/* CALENDARIO */
+
+.calendario-contenedor {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+    gap: 25px;
+    align-items: start;
+}
+
+#calendario {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+}
+
+.fc .fc-button-primary {
+    background: #189bd0;
+    border-color: #189bd0;
+}
+
+.fc .fc-button-primary:hover {
+    background: #117eac;
+}
+
+.fc .selected-date {
+    background: #cceeff !important;
+}
+
+.ayuda {
+    font-size: 13px;
+    color: #666;
+    margin: 8px 0 15px;
+}
+
+/* TARJETAS DE FECHAS */
+
+#lista-fechas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.fecha-card {
+    width: 235px;
+    border: 1px solid #d5d5d5;
+    border-radius: 8px;
+    padding: 12px;
+    position: relative;
+}
+
+.fecha-card strong {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.fecha-card .horarios {
+    display: flex;
+    gap: 8px;
+}
+
+.fecha-card input {
+    min-width: 0;
+    padding: 8px;
+}
+
+.fecha-card label {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.eliminar-fecha {
+    position: absolute;
+    right: 8px;
+    top: 7px;
+    border: none;
+    background: none;
+    color: #c33;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* TABLAS */
+
+.tabla-contenedor {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 9px;
+    text-align: left;
+    min-width: 100px;
+}
+
+th {
+    color: #777;
+    font-weight: normal;
+}
+
+td[contenteditable="true"]:focus {
+    outline: 2px solid #189bd0;
+    outline-offset: -2px;
+}
+
+.boton-agrqut {
+    background: white;
+    border: 2px solid #aaa;
+    border-radius: 6px;
+    color: #888;
+    font-size: 25px;
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+}
+
+.boton-agrqut:hover {
+    border-color: #189bd0;
+    color: #189bd0;
+}
+
+
+.tabla-fila {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* BOTONES FINALES */
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+.acciones button {
+    border: none;
+    border-radius: 7px;
+    padding: 13px 35px;
+    cursor: pointer;
+    font-size: 15px;
+    color: white;
+}
+
+.cancelar {
+    background: #303030;
+}
+
+.enviar {
+    background: #189bd0;
+}
+
+@media(max-width: 700px) {
+    header h1 {
+        font-size: 20px;
+    }
+
+    .logo-placeholder {
+        width: 100px;
+    }
+
+    .calendario-contenedor {
+        grid-template-columns: 1fr;
+    }
+}

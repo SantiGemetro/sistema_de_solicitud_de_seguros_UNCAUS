@@ -76,6 +76,12 @@
             font-size: 18px;
         }
 
+        .acciones-barra {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .btn-barra {
             background: #bd9810;
             color: white;
@@ -83,6 +89,8 @@
             padding: 10px 22px;
             border-radius: 8px;
             font-size: 15px;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-barra:hover {
@@ -260,9 +268,16 @@
 <div class="barra-operador">
     <div class="operador-usuario">
         <div class="icono-usuario">👤</div>
-        <span>{{ $operador->nombre ?? 'Nombre operador' }} ▾</span>
+        <span>{{ $operador->nombre ?? session('operador_nombre', 'Nombre operador') }} ▾</span>
     </div>
-    <a href="{{ route('formulario.create') }}" class="btn-barra">Registrar coordinador</a>
+    <div class="acciones-barra">
+        <a href="{{ route('operador.registrar') }}" class="btn-barra">Registrar operador</a>
+        <a href="{{ route('formulario.create') }}" class="btn-barra">Nueva solicitud</a>
+        <form action="{{ route('operador.logout') }}" method="POST" style="margin: 0;">
+            @csrf
+            <button type="submit" class="btn-barra">Cerrar sesión</button>
+        </form>
+    </div>
 </div>
 
 <main>
