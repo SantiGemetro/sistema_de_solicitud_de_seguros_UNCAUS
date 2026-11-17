@@ -42,6 +42,8 @@ class Formulario extends Model
             Estudiante::class, //referencia a modelo Estudiantes
             'nomina_estudiantes',
             'id_formulario',
+            'dni_estudiante',
+            'id_formulario',
             'dni_estudiante'
         );
     }
@@ -52,7 +54,9 @@ class Formulario extends Model
             Profesor::class, //referencia a modelo Profesor (El modelo con el que se relaciona)
             'nomina_profesores', //La tabla pivote (intermedia) en la BD
             'id_formulario', //La FK en la pivote que apunta a ESTE modelo (Formulario)
-            'dni_profesor' //La FK en la pivote que apunta al OTRO modelo (Profesor)
+            'dni_profesor', //La FK en la pivote que apunta al OTRO modelo (Profesor)
+            'id_formulario', //La PK de ESTE modelo (Formulario)
+            'dni_profesor' //La PK del OTRO modelo (Profesor)
         );
     }
 }

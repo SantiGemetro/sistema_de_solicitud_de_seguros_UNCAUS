@@ -18,8 +18,8 @@ class Profesor extends Model
         return $this->belongsToMany(
             Formulario::class,
             'nomina_profesores',
-            'dni_profesor',
-            'id_formulario'
+            'dni_profesor', // FK en la pivote que apunta a Formulario
+            'id_formulario' // FK en la pivote que apunta a Profesor
         );
     }
 }

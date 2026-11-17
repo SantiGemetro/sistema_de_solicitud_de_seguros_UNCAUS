@@ -79,7 +79,7 @@ class FormularioController extends Controller
                 // profe y fechas tmb ! ! !
 
                 // 6) Redireccionar con éxito 
-                return redirect()->route('Formulario.create') //redirect es un metodo get, por eso lo mandamos a esta ruta
+                return redirect()->route('inicio') //redirect es un metodo get, por eso lo mandamos a esta ruta
                                 ->with('success', 'Formulario enviado correctamente, estado: pendiente');
             });
         }catch(\Exception $e){
