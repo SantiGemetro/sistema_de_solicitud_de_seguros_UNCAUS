@@ -13,4 +13,13 @@ class Profesor extends Model
     public $timestamps = false;
 
     protected $fillable = ['dni_profesor', 'nombre', 'domicilio'];
+    public function formularios()
+    {
+        return $this->belongsToMany(
+            Formulario::class,
+            'nomina_profesores',
+            'dni_profesor', // FK en la pivote que apunta a Formulario
+            'id_formulario' // FK en la pivote que apunta a Profesor
+        );
+    }
 }

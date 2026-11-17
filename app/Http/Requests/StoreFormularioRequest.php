@@ -18,12 +18,18 @@ class StoreFormularioRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
-
+    protected function prepareForValidation(): void
+    {
+        $this->merge([ //preparar todas las tablas enviadas en json
+            'estudiantes' => json_decode($this->estudiantes, true),
+            'profesores' => json_decode($this->profesores, true),
+            'fechas' => json_decode($this->input('fechas'), true)
+        ]);
+    }
     /**
      * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
@@ -31,31 +37,36 @@ class StoreFormularioRequest extends FormRequest
         return [
             // Solicitante y Coordinador
             'correo_solicitante'    => 'required|email|max:100',
-            'id_coordinador_avala'  => 'required|exists:coordinador,id_coordinador',
+            
             
             // Datos del Formulario
-            'nom_lugar'             => 'required|string|max:100',
+            'nom_lugar'             => 'required|string|max:100', //cambie de n a r
             'dir_lugar'             => 'required|string|max:150',
             'actividad'             => 'required|string|max:255',
-            'carrera'               => 'nullable|string|max:100',
-            'materia'               => 'nullable|string|max:100',
+            'carrera'               => 'required|string|max:100', //de n a r
+            'materia'               => 'required|string|max:100', //de n a r
+            //estado no se evalua porque no la debe enviar el ususario
 
-            // Intervalos de Fechas
+            //Fechas 
             'fechas'                => 'required|array|min:1',
-            'fechas.*.fecha_inicio' => 'required|date',
-            'fechas.*.fecha_fin'    => 'required|date|after:fechas.*.fecha_inicio',
-
+            'fechas.*.fecha'        => 'required|date_format:Y-m-d',
+            'fechas.*.hora_inicio'  => 'required|date_format:H:i',
+            'fechas.*.hora_fin'     => 'required|date_format:H:i',
+            
             // Nómina de Docentes
-            'profesores'            => 'nullable|array',
-            'profesores.*.dni'      => 'nullable|string|max:20',
-            'profesores.*.nombre'   => 'required|string|max:100',
-            'profesores.*.domicilio'=> 'required|string|max:150',
+            //como convertimos en un array numerico, ahora cada atributo corresponde a un numero
+            //0: nombre, 1:dni, 2:domicilio
+            'profesores'       => 'required|array|min:1',
+            'profesores.*.1'   => 'required|string|max:20', //dni_profesores
+            'profesores.*.0'   => 'required|string|max:100', //nombre
+            'profesores.*.2'   => 'required|string|max:150', //domicilio
 
             // Nómina de Estudiantes
-            'estudiantes'           => 'required|array|min:1',
-            'estudiantes.*.dni'     => 'required|numeric|max:20',
-            'estudiantes.*.nombre'  => 'required|string|max:100',
-            'estudiantes.*.domicilio'=> 'required|string|max:150',
+            //igual que en profes
+            'estudiantes'      => 'required|array|min:1',
+            'estudiantes.*.1'  => 'required|string|max:20', //dni_estudiante
+            'estudiantes.*.0'  => 'required|string|max:100', //nombre
+            'estudiantes.*.2'  => 'required|string|max:150', //domicilio
         ];
     }
 }

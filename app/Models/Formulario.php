@@ -8,7 +8,7 @@ class Formulario extends Model
 {
     protected $table = 'formulario';
     protected $primaryKey = 'id_formulario';
-    public $timestamps = false;
+    public $timestamps = false; // La tabla no usa created_at/updated_at
 
     protected $fillable = [
         'nom_lugar',
@@ -16,33 +16,33 @@ class Formulario extends Model
         'actividad',
         'carrera',
         'materia',
-        'id_coordinador_avala',
-        'id_coordinador_realiza',
         'id_solicitante',
-        'id_operador_confirma',
-        'estado',
+        'estado', //nuevo
     ];
 
     public function solicitante()
     {
-        return $this->belongsTo(Solicitante::class, 'id_solicitante', 'idsolicitante');
+        return $this->belongsTo( //pertenece a solo un solicitante
+            Solicitante::class,
+            'id_solicitante',
+            'id_solicitante'
+        );
     }
-
-    public function coordinadorAvala()
-    {
-        return $this->belongsTo(Coordinador::class, 'id_coordinador_avala', 'id_coordinador');
-    }
-
     public function fechas()
-    {
-        return $this->hasMany(FechasFormulario::class, 'id_formulario', 'id_formulario');
-    }
-
+{
+    return $this->hasMany( //un form tiene varias fechas
+        FechasFormulario::class,
+        'id_formulario',
+        'id_formulario'
+    );
+}
     public function estudiantes()
     {
         return $this->belongsToMany(
-            Estudiante::class,
+            Estudiante::class, //referencia a modelo Estudiantes
             'nomina_estudiantes',
+            'id_formulario',
+            'dni_estudiante',
             'id_formulario',
             'dni_estudiante'
         );
@@ -51,30 +51,12 @@ class Formulario extends Model
     public function profesores()
     {
         return $this->belongsToMany(
-            Profesor::class,
-            'nomina_profesores',
-            'id_formulario',
-            'dni_profesor'
+            Profesor::class, //referencia a modelo Profesor (El modelo con el que se relaciona)
+            'nomina_profesores', //La tabla pivote (intermedia) en la BD
+            'id_formulario', //La FK en la pivote que apunta a ESTE modelo (Formulario)
+            'dni_profesor', //La FK en la pivote que apunta al OTRO modelo (Profesor)
+            'id_formulario', //La PK de ESTE modelo (Formulario)
+            'dni_profesor' //La PK del OTRO modelo (Profesor)
         );
-    }
-
-    // Acá luego vamos a tener que añadir los codigos de
-    // cada carrera, eso es info a consultar
-    // Genera el código visual estilo #0001_ISI
-    public function getCodigoAttribute(): string
-    {
-        $numero = str_pad($this->id_formulario, 4, '0', STR_PAD_LEFT);
-        if (!$this->carrera) {
-            return "#{$numero}_AREA";
-        }
-        // Toma las iniciales de la carrera (ej. Ingeniería en Sistemas -> ISI)
-        $palabras = explode(' ', $this->carrera);
-        $siglas = '';
-        foreach ($palabras as $p) {
-            if (strlen($p) > 2 && !in_array(strtolower($p), ['en', 'de', 'del', 'la', 'las', 'los'])) {
-                $siglas .= strtoupper(substr($p, 0, 1));
-            }
-        }
-        return "#{$numero}_" . ($siglas ?: 'GEN');
     }
 }
