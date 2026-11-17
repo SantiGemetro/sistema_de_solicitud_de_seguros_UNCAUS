@@ -58,7 +58,8 @@ class FormularioController extends Controller
                             'domicilio' => $profesorData[2],
                         ]
                     );
-                    $formulario->profesores()->attach( $profesor[1]); //relaciona el dni
+                    //voy a probar poner nombre de atributo en vez de valor del array $profesor[1]
+                    $formulario->profesores()->attach( $profesor->dni_profesor); //relaciona el dni
                 }
 
                 // 5) Procesar y vincular Estudiantes (mismo proceso que para profes)
@@ -70,7 +71,7 @@ class FormularioController extends Controller
                             'domicilio' => $estudianteData[2],
                         ]
                     );
-                    $formulario->estudiantes()->attach($estudiante[1]); //relaciona el dni
+                    $formulario->estudiantes()->attach($estudiante->dni_estudiante); //relaciona el dni
                 }
 
                 //! ! ! Para que funcionen las sincronizaciones(attach) de estudiantes y profes tienen que estar las 
