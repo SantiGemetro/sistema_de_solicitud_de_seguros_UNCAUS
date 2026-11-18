@@ -9,7 +9,9 @@
 <body>
     <header>
         <h1>Gestión de solicitud de seguros</h1>
-        <div class="logo-placeholder">LOGO UNCAUS</div>
+        <div class="logo-container">
+            <img src="{{ asset('images/isologo-uncaus-blanco.png') }}" alt="Logo UNCAUS" class="logo-uncaus">
+        </div>
     </header>
 
     <div class="coord-header-bar">
@@ -44,7 +46,12 @@
             @foreach($solicitudesPendientes as $solicitud)
                 <div class="tarjeta-solicitud">
                     <strong>ID: #000{{ $solicitud->id_formulario }}_DEP</strong>
-                    <span class="badge-estado badge-pendiente">PENDIENTE</span>
+                    <!-- CONDICIONAL PARA EL BADGE SEGÚN EL ESTADO -->
+                    @if($solicitud->estado == 'pendiente')
+                        <span class="badge-estado" style="background: #e06d6d;">PENDIENTE</span>
+                    @elseif($solicitud->estado == 'avalado/listo')
+                        <span class="badge-estado" style="background: #68b368;">AVALADO / LISTO</span>
+                    @endif
                     <p>Solicitante: {{ $solicitud->solicitante->correo_solicitante ?? 'Sin correo' }}</p>
                     <p>Estudiantes: {{ $solicitud->estudiantes()->count() }}</p>
                     <p>Profesores: {{ $solicitud->profesores()->count() }}</p>

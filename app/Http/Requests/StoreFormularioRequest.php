@@ -34,39 +34,56 @@ class StoreFormularioRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            // Solicitante y Coordinador
-            'correo_solicitante'    => 'required|email|max:100',
-            
-            
+        $esCoordinador = session()->has('coordinador_id');
+        $tipoCoordinador = session('coordinador_tipo'); // 'carrera' o 'area'
+
+        // Reglas base comunes para cualquier formulario
+        $rules = [
             // Datos del Formulario
-            'nom_lugar'             => 'required|string|max:100', //cambie de n a r
+            'nom_lugar'             => 'required|string|max:100',
             'dir_lugar'             => 'required|string|max:150',
             'actividad'             => 'required|string|max:255',
-            'carrera'               => 'required|string|max:100', //de n a r
-            'materia'               => 'required|string|max:100', //de n a r
-            //estado no se evalua porque no la debe enviar el ususario
+            //estado no se evalua porque no la debe enviar el usuario
 
-            //Fechas 
+            //Fechas
             'fechas'                => 'required|array|min:1',
             'fechas.*.fecha'        => 'required|date_format:Y-m-d',
             'fechas.*.hora_inicio'  => 'required|date_format:H:i',
             'fechas.*.hora_fin'     => 'required|date_format:H:i',
-            
+
             // Nómina de Docentes
-            //como convertimos en un array numerico, ahora cada atributo corresponde a un numero
-            //0: nombre, 1:dni, 2:domicilio
-            'profesores'       => 'required|array|min:1',
-            'profesores.*.1'   => 'required|string|max:20', //dni_profesores
-            'profesores.*.0'   => 'required|string|max:100', //nombre
-            'profesores.*.2'   => 'required|string|max:150', //domicilio
+            'profesores'            => 'required|array|min:1',
+            'profesores.*.1'        => 'required|string|max:20', //dni_profesores
+            'profesores.*.0'        => 'required|string|max:100', //nombre
+            'profesores.*.2'        => 'required|string|max:150', //domicilio
 
             // Nómina de Estudiantes
-            //igual que en profes
-            'estudiantes'      => 'required|array|min:1',
-            'estudiantes.*.1'  => 'required|string|max:20', //dni_estudiante
-            'estudiantes.*.0'  => 'required|string|max:100', //nombre
-            'estudiantes.*.2'  => 'required|string|max:150', //domicilio
+            'estudiantes'           => 'required|array|min:1',
+            'estudiantes.*.1'       => 'required|string|max:20', //dni_estudiante
+            'estudiantes.*.0'       => 'required|string|max:100', //nombre
+            'estudiantes.*.2'       => 'required|string|max:150', //domicilio
         ];
+
+        // 1. Correo solicitante: obligatorio solo si NO es coordinador
+        if (!$esCoordinador) {
+            $rules['correo_solicitante'] = 'required|email|max:100';
+        }
+
+        // 2. Carrera y Materia: obligatorias solo si NO es un coordinador de tipo 'area'
+        if (!($esCoordinador && $tipoCoordinador === 'area')) {
+            $rules['carrera'] = 'required|string|max:100';
+            $rules['materia'] = 'required|string|max:100';
+        }
+        else {
+            $rules['carrera'] = 'nullable|string|max:100';
+            $rules['materia'] = 'nullable|string|max:100';
+        }
+
+        // 3. Firma y aclaración: obligatoria únicamente si lo solicita un coordinador
+        if ($esCoordinador) {
+            $rules['firma'] = 'required|image|mimes:jpeg,png,jpg|max:2048';
+        }
+
+        return $rules;
     }
 }

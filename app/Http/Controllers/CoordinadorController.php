@@ -49,6 +49,10 @@ class CoordinadorController extends Controller
         session([
             'coordinador_id' => $coordinador->id_coordinador,
             'coordinador_nombre' => $coordinador->nombre,
+            //para la logica de los casos de formulario
+            'coordinador_tipo' => $coordinador->tipo,
+            'coordinador_correo' => $coordinador->correo,
+            'coordinador_carrera' => $coordinador->carrera
         ]);
 
         return redirect()->route('coordinador.dashboard');
@@ -81,7 +85,7 @@ class CoordinadorController extends Controller
         }
 
         // Buscamos los formularios cuya carrera/área coincida con la del coordinador logueado
-        $solicitudesPendientes = Formulario::where('carrera', $coordinador->carrera)->get();
+        $solicitudesPendientes = Formulario::where('carrera', $coordinador->carrera)->whereIn('estado', ['pendiente', 'avalado/listo'])->get();
 
         return view('coordinador.index', compact('coordinador', 'solicitudesPendientes'));
     }
@@ -109,15 +113,28 @@ class CoordinadorController extends Controller
             return redirect()->route('coordinador.login');
         }
 
+        $formulario = Formulario::findOrFail($id);
+
+        // CASO 1: DESAVALAR LA SOLICITUD
+        if ($request->input('accion') === 'desavalar') {
+
+            $formulario->estado = 'pendiente';
+            $formulario->save();
+            return redirect()->route('coordinador.dashboard')
+                            ->with('success', 'La solicitud ha vuelto al estado pendiente.');
+        }
+
+        // CASO 2: AVALAR Y CONFIRMAR LA SOLICITUD (Requiere firma)
         $request->validate([
             'firma' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $formulario = Formulario::findOrFail($id);
-
         if ($request->hasFile('firma')) {
             $pathFirma = $request->file('firma')->store('firmas_coordinadores', 'public');
         }
+
+        $formulario->estado = 'avalado/listo'; // Cambia a estado listo
+        $formulario->save();
 
         return redirect()->route('coordinador.dashboard')
             ->with('success', '¡Solicitud confirmada y firmada exitosamente!');

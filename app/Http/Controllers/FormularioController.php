@@ -22,6 +22,11 @@ class FormularioController extends Controller
     {
         try {
             return DB::transaction(function () use ($request) {
+                $esCoordinador = session()->has('coordinador_id');
+
+                // Definir estado inicial
+                $estadoInicial = $esCoordinador ? 'avalado/listo' : 'pendiente';
+
                 // 1) Gestionar el Solicitante en sistema_seguros_bd (columna correo_solicitante)
                 $solicitante = Solicitante::firstOrCreate(
                     ['correo_solicitante' => $request->correo_solicitante]
@@ -35,7 +40,7 @@ class FormularioController extends Controller
                     'nom_lugar'      => $request->nom_lugar,
                     'dir_lugar'      => $request->dir_lugar,
                     'id_solicitante' => $solicitante->id_solicitante,
-                    'estado'         => 'pendiente',
+                    'estado'         => $estadoInicial,
                 ]);
 
                 // 3) Procesar y vincular fechas (columnas fecha, hora_inicio, hora_fin de sistema_seguros_bd.sql)
@@ -71,6 +76,11 @@ class FormularioController extends Controller
                     $formulario->estudiantes()->syncWithoutDetaching([$estudiante->dni_estudiante]);
                 }
 
+                // Redirección inteligente según quién haya creado la solicitud
+                if ($esCoordinador) {
+                    return redirect()->route('coordinador.dashboard')
+                                    ->with('success', '¡Solicitud guardada y avalada con éxito!');
+                }
                 // 6) Redireccionar con éxito a la pantalla de inicio
                 return redirect()->route('inicio')
                     ->with('success', 'Formulario enviado correctamente, estado: pendiente');

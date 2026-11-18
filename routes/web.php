@@ -15,6 +15,7 @@ Route::get('/inicio', function () {
 });
 
 // 2. Rutas del formulario de solicitud de seguro
+//por que estan duplicadas? xd
 Route::get('/solicitar-seguro', [FormularioController::class, 'create'])->name('Formulario.create');
 Route::get('/solicitud', [FormularioController::class, 'create'])->name('formulario.create');
 Route::post('/solicitar-seguro', [FormularioController::class, 'store'])->name('Formulario.store');

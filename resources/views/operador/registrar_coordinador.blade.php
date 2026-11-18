@@ -247,7 +247,9 @@
 
 <header>
     <h1>Gestión de solicitud de seguros</h1>
-    <div class="logo-placeholder">UNCAUS</div>
+    <div class="logo-container">
+        <img src="{{ asset('images/isologo-uncaus-blanco.png') }}" alt="Logo UNCAUS" class="logo-uncaus">
+    </div>
 </header>
 
 <main>

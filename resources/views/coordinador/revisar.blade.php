@@ -10,12 +10,14 @@
 
     <header>
         <h1>Gestión de solicitud de seguros</h1>
-        <div class="logo-placeholder">LOGO UNCAUS</div>
+        <div class="logo-container">
+            <img src="{{ asset('images/isologo-uncaus-blanco.png') }}" alt="Logo UNCAUS" class="logo-uncaus">
+        </div>
     </header>
 
     <main>
         <!-- Formulario de revisión (con los datos del formulario de prueba) -->
-        <form action="{{ route('coordinador.confirmar', $formulario->id_formulario) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('coordinador.confirmar', $formulario->id_formulario) }}" method="POST" enctype="multipart/form-data" id="formRevision">
             @csrf
 
             <!-- CARRERA -->
@@ -121,20 +123,45 @@
             </div>
 
             <!-- CAMPO DE FIRMA Y ACLARACIÓN (OBLIGATORIO PARA EL COORDINADOR) -->
-            <div class="campo" style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
-                <label for="firma"><strong>Firma y aclaración (Cargar imagen)</strong></label>
-                <p class="ayuda">Adjunte la imagen con su firma y sello para dar por confirmada la solicitud.</p>
-                <input type="file" name="firma" id="firma" accept="image/*" required style="border: 2px dashed #189bd0; padding: 20px; background: #f9f9f9;">
-            </div>
+            @if($formulario->estado === 'avalado/listo')
+                <!-- VISTA PREVIA DE LA FIRMA YA CARGADA -->
+                <label><strong>Firma y aclaración guardada</strong></label>
+                <p class="ayuda">Esta solicitud ya fue avalada con la siguiente firma:</p>
+
+                <div style="margin: 15px 0;">
+                    <img src="{{ asset('storage/' . $formulario->firma_aclaracion) }}"
+                        alt="Firma del coordinador"
+                        style="max-width: 300px; height: auto; border: 1px solid #ccc; border-radius: 6px; padding: 5px;">
+                </div>
+
+                <!-- Campo oculto para avisar al controlador que la acción es desavalar -->
+                <input type="hidden" name="accion" value="desavalar">
+
+            @else
+                <div class="campo" style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
+                    <label for="firma"><strong>Firma y aclaración (Cargar imagen)</strong></label>
+                    <p class="ayuda">Adjunte la imagen con su firma y sello para dar por confirmada la solicitud.</p>
+                    <input type="file" name="firma" id="firma" accept="image/*" required style="border: 2px dashed #189bd0; padding: 20px; background: #f9f9f9;">
+                </div>
+            @endif
 
             <!-- BOTONES FINALES -->
             <div class="acciones">
                 <a href="{{ route('coordinador.dashboard') }}" class="cancelar">
                     Cancelar
                 </a>
-                <button type="submit" class="enviar">
-                    Confirmar
-                </button>
+                @if($formulario->estado === 'avalado/listo')
+                    <input type="hidden" name="accion" value="desavalar">
+                    <!-- BOTÓN DESAVALAR (Naranja/Rojo) -->
+                    <button type="submit" class="enviar" style="background-color: #e06d6d;">
+                        Desavalar
+                    </button>
+                @else
+                    <!-- BOTÓN CONFIRMAR (Azul) -->
+                    <button type="submit" class="enviar">
+                        Avalar y Confirmar
+                    </button>
+                @endif
             </div>
 
         </form>
@@ -142,3 +169,13 @@
 
 </body>
 </html>
+
+<script>
+    document.getElementById('formRevision').addEventListener('submit', function(e) {
+        const inputFirma = document.getElementById('firma');
+        if (!inputFirma.files || inputFirma.files.length === 0) {
+            e.preventDefault();
+            alert('Debe cargar una imagen con su firma y aclaración para poder confirmar la solicitud.');
+        }
+    });
+</script>

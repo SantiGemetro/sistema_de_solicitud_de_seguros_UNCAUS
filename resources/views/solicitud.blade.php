@@ -24,7 +24,7 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-    
+
 </head>
 
 <body>
@@ -33,273 +33,309 @@
         <h1>Gestión de solicitud de seguros</h1>
 
         <!-- Reemplazar por el logo real -->
-        <div class="logo-placeholder">
-            LOGO UNCAUS
+        <div class="logo-container">
+            <img src="{{ asset('images/isologo-uncaus-blanco.png') }}" alt="Logo UNCAUS" class="logo-uncaus">
         </div>
     </header>
 
     <main>
 
-    <form id="formularioSeguro"
-        action="{{ route('Formulario.store') }}"
-        method="POST">
+        <form id="formularioSeguro"
+            action="{{ route('Formulario.store') }}"
+            method="POST"
+            enctype="multipart/form-data">
 
-        @csrf
+            @csrf
 
-        <!-- CARRERA -->
+            @php
+                // Verificamos si hay una sesión de coordinador o variable pasada desde el controller
+                $esCoordinador = session()->has('coordinador_id');
+                $tipoCoordinador = session('coordinador_tipo'); // 'carrera' o 'area'
+            @endphp
 
-        <div class="campo">
-            <label for="carrera">Carrera</label>
+            @if (!($esCoordinador && $tipoCoordinador === 'area'))
+                <!-- CARRERA -->
 
-            <select name="carrera" id="carrera" required>
-                <option value="">Seleccione una carrera</option>
-                <option value="Ingeniería en Sistemas">
-                    Ingeniería en Sistemas
-                </option>
-                <option value="Contador Público">
-                    Contador Público
-                </option>
-                <option value="Abogacía">
-                    Abogacía
-                </option>
-                <option value="Licenciatura en Administración">
-                    Licenciatura en Administración
-                </option>
-            </select>
-        </div>
+                <div class="campo">
+                    <label for="carrera">Carrera</label>
 
-        <!-- MATERIA -->
+                    <select name="carrera" id="carrera" required>
+                        <option value="">Seleccione una carrera</option>
+                        <option value="Ingeniería en Sistemas">
+                            Ingeniería en Sistemas
+                        </option>
+                        <option value="Contador Público">
+                            Contador Público
+                        </option>
+                        <option value="Abogacía">
+                            Abogacía
+                        </option>
+                        <option value="Licenciatura en Administración">
+                            Licenciatura en Administración
+                        </option>
+                    </select>
+                </div>
 
-        <div class="campo">
-            <label for="materia">Materia</label>
+                <!-- MATERIA -->
 
-            <div class="materia-container">
+                <div class="campo">
+                    <label for="materia">Materia</label>
+
+                    <div class="materia-container">
+                        <input type="text"
+                            id="materia"
+                            name="materia"
+                            placeholder="Primero seleccione una carrera"
+                            disabled
+                            autocomplete="off"
+                            required>
+
+                        <div id="resultados-materia"></div>
+                    </div>
+                </div>
+            @endif
+
+
+            <!-- ACTIVIDAD -->
+
+            <div class="campo">
+                <label for="actividad">
+                    Actividad a realizar (detallar brevemente)
+                </label>
+
+                <textarea name="actividad"
+                        id="actividad"
+                        maxlength="255"
+                        required></textarea>
+            </div>
+
+            <!-- FECHAS -->
+
+            <div class="campo">
+
+                <label>Fechas de las actividades a realizar</label>
+
+                <p class="ayuda">
+                    Seleccione días individuales haciendo clic sobre ellos,
+                    o arrastre el cursor para seleccionar un rango de fechas.
+                </p>
+
+                <div class="calendario-contenedor">
+
+                    <div id="calendario"></div>
+
+                    <div>
+                        <h3>Fechas seleccionadas</h3>
+
+                        <p class="ayuda">
+                            Puede modificar el horario de cada día
+                            individualmente.
+                        </p>
+
+                        <div id="lista-fechas"></div>
+                    </div>
+
+                </div>
+
+                <!-- Los datos se enviarán como JSON -->
+                <input type="hidden"
+                    name="fechas"
+                    id="fechas">
+
+            </div>
+
+            <!-- LUGAR -->
+
+            <div class="campo">
+                <label for="nom_lugar">
+                    Nombre del establecimiento/lugar al que asistirán
+                </label>
+
                 <input type="text"
-                    id="materia"
-                    name="materia"
-                    placeholder="Primero seleccione una carrera"
-                    disabled
-                    autocomplete="off"
+                    name="nom_lugar"
+                    id="nom_lugar"
+                    maxlength="155"
                     required>
-
-                <div id="resultados-materia"></div>
-            </div>
-        </div>
-
-        <!-- ACTIVIDAD -->
-
-        <div class="campo">
-            <label for="actividad">
-                Actividad a realizar (detallar brevemente)
-            </label>
-
-            <textarea name="actividad"
-                    id="actividad"
-                    maxlength="255"
-                    required></textarea>
-        </div>
-
-        <!-- FECHAS -->
-
-        <div class="campo">
-
-            <label>Fechas de las actividades a realizar</label>
-
-            <p class="ayuda">
-                Seleccione días individuales haciendo clic sobre ellos,
-                o arrastre el cursor para seleccionar un rango de fechas.
-            </p>
-
-            <div class="calendario-contenedor">
-
-                <div id="calendario"></div>
-
-                <div>
-                    <h3>Fechas seleccionadas</h3>
-
-                    <p class="ayuda">
-                        Puede modificar el horario de cada día
-                        individualmente.
-                    </p>
-
-                    <div id="lista-fechas"></div>
-                </div>
-
             </div>
 
-            <!-- Los datos se enviarán como JSON -->
-            <input type="hidden"
-                name="fechas"
-                id="fechas">
+            <!-- DIRECCION -->
 
-        </div>
+            <div class="campo">
+                <label for="dir_lugar">
+                    Dirección del establecimiento/lugar al que asistirán
+                </label>
 
-        <!-- LUGAR -->
+                <input type="text"
+                    name="dir_lugar"
+                    id="dir_lugar"
+                    maxlength="155"
+                    required>
+            </div>
 
-        <div class="campo">
-            <label for="nom_lugar">
-                Nombre del establecimiento/lugar al que asistirán
-            </label>
+            <!-- ESTUDIANTES -->
 
-            <input type="text"
-                name="nom_lugar"
-                id="nom_lugar"
-                maxlength="155"
-                required>
-        </div>
+            <div class="campo">
 
-        <!-- DIRECCION -->
+                <label>Nómina de estudiantes</label>
 
-        <div class="campo">
-            <label for="dir_lugar">
-                Dirección del establecimiento/lugar al que asistirán
-            </label>
+                <p class="ayuda">
+                    Puede escribir directamente en las celdas o pegar
+                    datos copiados desde una tabla.
+                </p>
 
-            <input type="text"
-                name="dir_lugar"
-                id="dir_lugar"
-                maxlength="155"
-                required>
-        </div>
+                <div class="tabla-fila">
 
-        <!-- ESTUDIANTES -->
+                    <div class="tabla-contenedor" style="flex:1">
 
-        <div class="campo">
+                        <table id="tabla-estudiantes">
 
-            <label>Nómina de estudiantes</label>
+                            <thead>
+                                <tr>
+                                    <th>Nombre completo</th>
+                                    <th>DNI</th>
+                                    <th>Domicilio</th>
+                                </tr>
+                            </thead>
 
-            <p class="ayuda">
-                Puede escribir directamente en las celdas o pegar
-                datos copiados desde una tabla.
-            </p>
+                            <tbody>
+                                <tr>
+                                    <td contenteditable="true"></td>
+                                    <td contenteditable="true"></td>
+                                    <td contenteditable="true"></td>
+                                </tr>
+                            </tbody>
 
-            <div class="tabla-fila">
+                        </table>
 
-                <div class="tabla-contenedor" style="flex:1">
+                    </div>
 
-                    <table id="tabla-estudiantes">
+                    <button type="button"
+                            class="boton-agrqut"
+                            onclick="agregarFila('tabla-estudiantes')">
+                        +
+                    </button>
 
-                        <thead>
-                            <tr>
-                                <th>Nombre completo</th>
-                                <th>DNI</th>
-                                <th>Domicilio</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <td contenteditable="true"></td>
-                                <td contenteditable="true"></td>
-                                <td contenteditable="true"></td>
-                            </tr>
-                        </tbody>
-
-                    </table>
+                    <button type="button"
+                            class="boton-agrqut"
+                            onclick="quitarFila('tabla-estudiantes')">
+                        -
+                    </button>
 
                 </div>
 
-                <button type="button"
-                        class="boton-agrqut"
-                        onclick="agregarFila('tabla-estudiantes')">
-                    +
-                </button>
-
-                <button type="button"
-                        class="boton-agrqut"
-                        onclick="quitarFila('tabla-estudiantes')">
-                    -
-                </button>
+                <input type="hidden"
+                    name="estudiantes"
+                    id="estudiantes">
 
             </div>
 
-            <input type="hidden"
-                name="estudiantes"
-                id="estudiantes">
+            <!-- PROFESORES -->
 
-        </div>
+            <div class="campo">
 
-        <!-- PROFESORES -->
+                <label>Nómina de profesores</label>
 
-        <div class="campo">
+                <div class="tabla-fila">
 
-            <label>Nómina de profesores</label>
+                    <div class="tabla-contenedor" style="flex:1">
 
-            <div class="tabla-fila">
+                        <table id="tabla-profesores">
 
-                <div class="tabla-contenedor" style="flex:1">
+                            <thead>
+                                <tr>
+                                    <th>Nombre completo</th>
+                                    <th>DNI</th>
+                                    <th>Domicilio</th>
+                                </tr>
+                            </thead>
 
-                    <table id="tabla-profesores">
+                            <tbody>
+                                <tr>
+                                    <td contenteditable="true"></td>
+                                    <td contenteditable="true"></td>
+                                    <td contenteditable="true"></td>
+                                </tr>
+                            </tbody>
 
-                        <thead>
-                            <tr>
-                                <th>Nombre completo</th>
-                                <th>DNI</th>
-                                <th>Domicilio</th>
-                            </tr>
-                        </thead>
+                        </table>
 
-                        <tbody>
-                            <tr>
-                                <td contenteditable="true"></td>
-                                <td contenteditable="true"></td>
-                                <td contenteditable="true"></td>
-                            </tr>
-                        </tbody>
+                    </div>
 
-                    </table>
+                    <button type="button"
+                            class="boton-agrqut"
+                            onclick="agregarFila('tabla-profesores')">
+                        +
+                    </button>
+
+                    <button type="button"
+                            class="boton-agrqut"
+                            onclick="quitarFila('tabla-profesores')">
+                        -
+                    </button>
 
                 </div>
 
-                <button type="button"
-                        class="boton-agrqut"
-                        onclick="agregarFila('tabla-profesores')">
-                    +
-                </button>
+                <input type="hidden"
+                    name="profesores"
+                    id="profesores">
 
-                <button type="button"
-                        class="boton-agrqut"
-                        onclick="quitarFila('tabla-profesores')">
-                    -
+            </div>
+
+            <!-- CORREO -->
+
+            @if($esCoordinador)
+                <!-- Si es coordinador, el correo se toma automáticamente de la sesión -->
+                <input type="hidden" name="correo_solicitante" value="{{ session('correo') }}">
+            @else
+                <div class="campo">
+                    <label for="correo_solicitante">
+                        Indíquenos su correo electrónico para mantenerlo informado
+                    </label>
+
+                    <input type="email"
+                        name="correo_solicitante"
+                        id="correo_solicitante"
+                        size="30"
+                        required>
+                </div>
+            @endif
+
+            <!-- FIRMA Y ACLARACIÓN (SOLO PARA COORDINADORES) -->
+            @if($esCoordinador)
+                <div class="campo" style="margin-top: 25px; border-top: 2px dashed #ddd; padding-top: 20px;">
+                    <label for="firma">
+                        <strong>Firma y aclaración (Cargar imagen)</strong>
+                    </label>
+                    <p class="ayuda">Adjunte su firma para avalar esta solicitud al momento del envío.</p>
+                    <input type="file"
+                        name="firma"
+                        id="firma"
+                        accept="image/*"
+                        required>
+                </div>
+            @endif
+
+            <!-- BOTONES -->
+
+            <div class="acciones">
+
+                @if($esCoordinador)
+                    <a href="{{ route('coordinador.dashboard') }}" class="cancelar" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 13px 35px;">
+                        Cancelar
+                    </a>
+                @else
+                    <a href="{{ route('inicio') }}" class="cancelar" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; padding: 13px 35px;">
+                        Cancelar
+                    </a>
+                @endif
+
+                <button type="submit" class="enviar">
+                    Enviar
                 </button>
 
             </div>
 
-            <input type="hidden"
-                name="profesores"
-                id="profesores">
-
-        </div>
-
-        <!-- CORREO -->
-
-        <div class="campo">
-            <label for="correo_solicitante">
-                Indíquenos su correo electrónico para mantenerlo informado
-            </label>
-
-            <input type="email"
-                name="correo_solicitante"
-                id="correo_solicitante"
-                size="30"
-                required>
-        </div>
-
-        <!-- BOTONES -->
-
-        <div class="acciones">
-
-            <button type="reset" class="cancelar">
-                Cancelar
-            </button>
-
-            <button type="submit" class="enviar">
-                Enviar
-            </button>
-
-        </div>
-
-    </form>
+        </form>
 
     </main>
 
@@ -347,26 +383,27 @@
 
     let materiaSeleccionada = false;
 
-    carrera.addEventListener("change", function() {
+    if (carrera){
+        carrera.addEventListener("change", function() {
 
-        materia.value = "";
-        materiaSeleccionada = false;
-        resultados.innerHTML = "";
+            materia.value = "";
+            materiaSeleccionada = false;
+            resultados.innerHTML = "";
 
-        materia.disabled = !this.value;
+            materia.disabled = !this.value;
 
-        materia.placeholder = this.value
-            ? "Buscar materia..."
-            : "Primero seleccione una carrera";
+            materia.placeholder = this.value
+                ? "Buscar materia..."
+                : "Primero seleccione una carrera";
+        });
+    }
 
-    });
-
-    materia.addEventListener("input", function() {
-
-        materiaSeleccionada = false;
-        mostrarMaterias(this.value);
-
-    });
+    if (materia){
+        materia.addEventListener("input", function() {
+            materiaSeleccionada = false;
+            mostrarMaterias(this.value);
+        });
+    }
 
     function mostrarMaterias(texto) {
 
@@ -466,7 +503,7 @@
         actualizarFechas(); //n
     }
 
-    //crea el sector de las tarjetas 
+    //crea el sector de las tarjetas
     function actualizarFechas() {
         listaFechas.innerHTML = ""; //limpiar html
         const fechas = Array.from(fechasSeleccionadas.keys()).sort(); //convierte las llaves del map a un arreglo y las ordena cronologicamente
@@ -731,7 +768,10 @@
         .addEventListener("submit", function(e) {
 
             // Validar materia
-            if (!materiaSeleccionada) {
+            const esArea = @json(session('tipo') === 'area');
+
+            // Validar materia solo si NO es un coordinador de área
+            if (!esArea && !materiaSeleccionada) {
                 e.preventDefault();
                 alert("Debe seleccionar una materia de la lista.");
                 return;
