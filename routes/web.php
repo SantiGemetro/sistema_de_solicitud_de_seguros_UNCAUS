@@ -5,7 +5,7 @@ use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\CoordinadorController;
 use App\Http\Controllers\OperadorController;
 
-// 1. Pantalla principal de inicio en la raíz '/' (y alias '/inicio')
+// 1. Pantalla principal de inicio (Prueba_Pantalla_Inicial)
 Route::get('/', function () {
     return view('Prueba_Pantalla_Inicial');
 })->name('inicio');
@@ -30,7 +30,14 @@ Route::get('/operador', [OperadorController::class, 'index'])->name('operador.in
 Route::get('/operador/formulario/{id}', [OperadorController::class, 'show'])->name('operador.show');
 Route::patch('/operador/formulario/{id}/estado', [OperadorController::class, 'actualizarEstado'])->name('operador.estado');
 
-// 4. Rutas del Coordinador
+// 4. Rutas de Registro de Nuevo Coordinador (dentro del rol de Operador de BE)
+Route::get('/operador/coordinador/registrar', [CoordinadorController::class, 'registrar'])->name('coordinador.registrar');
+Route::post('/operador/coordinador/registrar', [CoordinadorController::class, 'store'])->name('coordinador.store');
+
+// 5. Rutas de Login y Pantalla Principal del Coordinador (coordinador/index.blade.php)
+Route::get('/coordinador/login', [CoordinadorController::class, 'showLogin'])->name('coordinador.login');
+Route::post('/coordinador/login', [CoordinadorController::class, 'login'])->name('coordinador.login.post');
+Route::post('/coordinador/logout', [CoordinadorController::class, 'logout'])->name('coordinador.logout');
 Route::get('/coordinador', [CoordinadorController::class, 'index'])->name('coordinador.dashboard');
 Route::get('/coordinador/revisar/{id}', [CoordinadorController::class, 'show'])->name('coordinador.revisar');
 Route::post('/coordinador/confirmar/{id}', [CoordinadorController::class, 'confirmar'])->name('coordinador.confirmar');

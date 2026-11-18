@@ -272,6 +272,7 @@
     </div>
     <div class="acciones-barra">
         <a href="{{ route('operador.registrar') }}" class="btn-barra">Registrar operador</a>
+        <a href="{{ route('coordinador.registrar') }}" class="btn-barra">Registrar nuevo coordinador</a>
         <a href="{{ route('formulario.create') }}" class="btn-barra">Nueva solicitud</a>
         <form action="{{ route('operador.logout') }}" method="POST" style="margin: 0;">
             @csrf
@@ -294,13 +295,13 @@
                 <div class="tarjeta-solicitud">
                     <div class="tarjeta-datos">
                         <p class="id-solicitud">ID: {{ $form->codigo }}</p>
-                        <p>Solicitante: {{ $form->solicitante->correo ?? 'Sin correo' }}</p>
+                        <p>Solicitante: {{ $form->solicitante->correo_solicitante ?? $form->solicitante->correo ?? 'Sin correo' }}</p>
                         <p>Estudiantes: {{ $form->estudiantes_count }}</p>
                         <p>Profesores: {{ $form->profesores_count }}</p>
                     </div>
 
                     <div class="tarjeta-acciones">
-                        @if($form->estado === 'PENDIENTE_AVAL')
+                        @if($form->estado === 'PENDIENTE_AVAL' || $form->estado === 'pendiente')
                             <span class="estado-tag tag-pendiente">PENDIENTE</span>
                             <a href="{{ route('operador.show', $form->id_formulario) }}" class="btn-revisar">Revisar</a>
                         @else
@@ -328,14 +329,14 @@
                         <div>
                             <strong>{{ $item->codigo }}</strong>
                             <div style="font-size: 13px; color: #555; margin-top: 3px;">
-                                {{ $item->solicitante->correo ?? '' }}
+                                {{ $item->solicitante->correo_solicitante ?? $item->solicitante->correo ?? '' }}
                             </div>
                             <div style="font-size: 12px; color: #888;">
                                 {{ $item->carrera ?? $item->actividad }}
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            @if($item->estado === 'ACEPTADO')
+                            @if($item->estado === 'ACEPTADO' || $item->estado === 'enviado')
                                 <span class="estado-tag tag-listo">ACEPTADO</span>
                             @else
                                 <span class="estado-tag tag-pendiente">RECHAZADO</span>

@@ -25,10 +25,10 @@
             <!-- 1.a) Lleva al formulario de solicitud -->
             <a href="{{ route('Formulario.create') }}" class="btn-principal">Realizar solicitud</a>
 
-            <!-- 1.b) Lleva a la interfaz de usuario del coordinador -->
-            <a href="{{ route('coordinador.dashboard') }}" class="btn-principal btn-secundario">Ingresar como coordinador</a>
+            <!-- 1.b) Lleva al Login del Coordinador -> luego a coordinador/index.blade.php -->
+            <a href="{{ route('coordinador.login') }}" class="btn-principal btn-secundario">Ingresar como coordinador</a>
 
-            <!-- 1.c) Lleva al login del operador de bienestar -->
+            <!-- 1.c) Lleva al Login del Operador de Bienestar -->
             <a href="{{ route('operador.login') }}" class="btn-principal">Ingresar como operador de bienestar</a>
         </div>
     </main>

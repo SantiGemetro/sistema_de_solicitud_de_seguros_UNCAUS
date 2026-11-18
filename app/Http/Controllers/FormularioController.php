@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreFormularioRequest;
-use Illuminate\Http\Request;
-use App\Models\Formulario; 
+use App\Models\Formulario;
 use App\Models\Estudiante;
 use App\Models\Profesor;
-use App\Models\FechasFormulario;
 use App\Models\Solicitante;
 use Illuminate\Support\Facades\DB;
 
@@ -19,50 +17,49 @@ class FormularioController extends Controller
         return view('solicitud');
     }
 
-    // Procesa los datos y los guarda en la base de datos
+    // Procesa los datos y los guarda en sistema_seguros_bd
     public function store(StoreFormularioRequest $request)
     {
-        try{
-            //envolvemos en una transaccion para que los datos se envien una vez terminados de procesar
-            return DB::transaction(function () use ($request){
-                // 1) Gestionar el Solicitante (solicitante=variable)
-                $solicitante = Solicitante::firstOrCreate( //buscar o crear correo en BD (por correo)
+        try {
+            return DB::transaction(function () use ($request) {
+                // 1) Gestionar el Solicitante en sistema_seguros_bd (columna correo_solicitante)
+                $solicitante = Solicitante::firstOrCreate(
                     ['correo_solicitante' => $request->correo_solicitante]
                 );
 
                 // 2) Crear el Formulario principal
-                $formulario = $solicitante->formularios()->create([ //ahora crea el form para el slicitante
+                $formulario = $solicitante->formularios()->create([
                     'materia'        => $request->materia,
                     'actividad'      => $request->actividad,
                     'carrera'        => $request->carrera,
                     'nom_lugar'      => $request->nom_lugar,
                     'dir_lugar'      => $request->dir_lugar,
                     'id_solicitante' => $solicitante->id_solicitante,
-                    'estado'         => 'pendiente', // Definido automáticamente por el sistema
+                    'estado'         => 'pendiente',
                 ]);
 
-                // 3) Procesar y vincular fechas
+                // 3) Procesar y vincular fechas (columnas fecha, hora_inicio, hora_fin de sistema_seguros_bd.sql)
                 foreach ($request->fechas as $fecha) {
                     $formulario->fechas()->create([
-                        'fecha' => $fecha['fecha'],
+                        'fecha'       => $fecha['fecha'],
                         'hora_inicio' => $fecha['hora_inicio'],
-                        'hora_fin' => $fecha['hora_fin']
+                        'hora_fin'    => $fecha['hora_fin'],
                     ]);
                 }
+
                 // 4) Procesar y vincular Profesores
-                foreach ($request->profesores as $profesorData) { //para cada profesor
-                    $profesor = Profesor::updateOrCreate( //buscar o crear en BD (por DNI)
+                foreach ($request->profesores as $profesorData) {
+                    $profesor = Profesor::updateOrCreate(
                         ['dni_profesor' => $profesorData[1]],
                         [
                             'nombre'    => $profesorData[0],
                             'domicilio' => $profesorData[2],
                         ]
                     );
-                    //voy a probar poner nombre de atributo en vez de valor del array $profesor[1]
-                    $formulario->profesores()->attach( $profesor->dni_profesor); //relaciona el dni
+                    $formulario->profesores()->syncWithoutDetaching([$profesor->dni_profesor]);
                 }
 
-                // 5) Procesar y vincular Estudiantes (mismo proceso que para profes)
+                // 5) Procesar y vincular Estudiantes
                 foreach ($request->estudiantes as $estudianteData) {
                     $estudiante = Estudiante::updateOrCreate(
                         ['dni_estudiante' => $estudianteData[1]],
@@ -71,19 +68,14 @@ class FormularioController extends Controller
                             'domicilio' => $estudianteData[2],
                         ]
                     );
-                    $formulario->estudiantes()->attach($estudiante->dni_estudiante); //relaciona el dni
+                    $formulario->estudiantes()->syncWithoutDetaching([$estudiante->dni_estudiante]);
                 }
 
-                //! ! ! Para que funcionen las sincronizaciones(attach) de estudiantes y profes tienen que estar las 
-                // relaciones belongToMany declaradas en el FormularioCotroller y en los controllers de estudiante, 
-                // profe y fechas tmb ! ! !
-
-                // 6) Redireccionar con éxito 
-                return redirect()->route('inicio') //redirect es un metodo get, por eso lo mandamos a esta ruta
-                                ->with('success', 'Formulario enviado correctamente, estado: pendiente');
+                // 6) Redireccionar con éxito a la pantalla de inicio
+                return redirect()->route('inicio')
+                    ->with('success', 'Formulario enviado correctamente, estado: pendiente');
             });
-        }catch(\Exception $e){
-            // Esto intercepta CUALQUIER error oculto y lo imprime en pantalla obligatoriamente
+        } catch (\Exception $e) {
             dd($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }
