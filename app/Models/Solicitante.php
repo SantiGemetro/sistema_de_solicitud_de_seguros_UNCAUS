@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Solicitante extends Model
 {
     protected $table = 'solicitante';
-    protected $primaryKey = 'idsolicitante';
+    protected $primaryKey = 'id_solicitante'; // En sistema_seguros_bd.sql se llama id_solicitante
     public $timestamps = false;
 
     protected $fillable = ['correo_solicitante'];
-    //relacion con el formulario
+
+    // Relación con el formulario
     public function formularios()
     {
-        return $this->hasMany( //puede tener varios forms
+        return $this->hasMany(
             Formulario::class,
-            'id_solicitante', 
+            'id_solicitante',
             'id_solicitante'
         );
     }

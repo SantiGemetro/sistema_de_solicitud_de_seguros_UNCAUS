@@ -10,9 +10,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Gestión de Solicitud de Seguros</title>
     <link href="{{ asset('css/estilo.css') }}" rel="stylesheet">
-    <style>
-        
-    </style>
 </head>
 <body>
     <header>
@@ -24,12 +21,15 @@
         <div class="contenedor-inicio">
             <h2>Bienvenido al Sistema de Seguros Estudiantiles</h2>
             <p class="ayuda">Seleccione una opción para comenzar:</p>
-            
+
             <!-- 1.a) Lleva al formulario de solicitud -->
             <a href="{{ route('Formulario.create') }}" class="btn-principal">Realizar solicitud</a>
-            
+
             <!-- 1.b) Lleva a la interfaz de usuario del coordinador -->
             <a href="{{ route('coordinador.dashboard') }}" class="btn-principal btn-secundario">Ingresar como coordinador</a>
+
+            <!-- 1.c) Lleva al login del operador de bienestar -->
+            <a href="{{ route('operador.login') }}" class="btn-principal">Ingresar como operador de bienestar</a>
         </div>
     </main>
 </body>
