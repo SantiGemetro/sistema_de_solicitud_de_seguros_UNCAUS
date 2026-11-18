@@ -25,6 +25,7 @@ header {
 header h1 {
     font-size: 32px;
     font-weight: 500;
+    margin: 0;
 }
 
 .logo-placeholder {
@@ -36,6 +37,20 @@ header h1 {
     justify-content: center;
     color: #ddd;
     font-size: 13px;
+}
+
+/* Contenedor y ajuste del logo en el header */
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-uncaus {
+    max-height: 65px; /* Limita la altura para que encaje con la altura de 110px del header */
+    width: auto; /* Mantiene la proporción original de la imagen */
+    object-fit: contain;
 }
 
 /* FORMULARIO */
@@ -267,8 +282,8 @@ td[contenteditable="true"]:focus {
 
 .cancelar {
     background: #303030;
-    color: white !important; /* Fuerza a que el texto sea blanco */
-    text-decoration: none !important; /* Elimina el subrayado azul */
+    color: white !important;
+    text-decoration: none !important;
     border: none;
     border-radius: 7px;
     padding: 13px 35px;
@@ -280,19 +295,7 @@ td[contenteditable="true"]:focus {
     background: #189bd0;
 }
 
-@media (max-width: 700px) {
-    header h1 {
-        font-size: 20px;
-    }
-
-    .logo-placeholder {
-        width: 100px;
-    }
-
-    .calendario-contenedor {
-        grid-template-columns: 1fr;
-    }
-}
+/* PANTALLA INICIAL Y COORDINADOR */
 
 .contenedor-inicio {
     display: flex;
@@ -303,6 +306,7 @@ td[contenteditable="true"]:focus {
     text-align: center;
     gap: 20px;
 }
+
 .btn-principal {
     background: #189bd0;
     color: white;
@@ -315,15 +319,19 @@ td[contenteditable="true"]:focus {
     transition: background 0.2s;
     width: 300px;
 }
+
 .btn-principal:hover {
     background: #117eac;
 }
+
 .btn-secundario {
     background: #414d51;
 }
+
 .btn-secundario:hover {
     background: #2f383b;
 }
+
 .coord-header-bar {
     background: #414d51;
     padding: 10px 5%;
@@ -332,12 +340,14 @@ td[contenteditable="true"]:focus {
     align-items: center;
     color: white;
 }
+
 .coord-user {
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 15px;
 }
+
 .btn-solicitar-seguro {
     background: #189bd0;
     color: white;
@@ -346,9 +356,11 @@ td[contenteditable="true"]:focus {
     text-decoration: none;
     font-weight: bold;
 }
+
 .btn-solicitar-seguro:hover {
     background: #117eac;
 }
+
 .tarjeta-solicitud {
     background: #e2e2e2;
     border-radius: 8px;
@@ -357,11 +369,13 @@ td[contenteditable="true"]:focus {
     position: relative;
     max-width: 800px;
 }
+
 .tarjeta-solicitud p {
     margin: 5px 0;
     color: #555;
     font-size: 14px;
 }
+
 .badge-estado {
     position: absolute;
     top: 15px;
@@ -372,12 +386,15 @@ td[contenteditable="true"]:focus {
     font-weight: bold;
     color: white;
 }
+
 .badge-pendiente {
     background: #e06d6d;
 }
+
 .badge-aceptada {
     background: #68b368;
 }
+
 .btn-revisar {
     position: absolute;
     top: 12px;
@@ -391,18 +408,468 @@ td[contenteditable="true"]:focus {
     text-decoration: none;
     font-size: 13px;
 }
+
 .btn-revisar:hover {
     background: #117eac;
 }
-/* Contenedor y ajuste del logo en el header */
-.logo-container {
+
+/* =====================================================
+   LOGIN (COORDINADOR Y OPERADOR)
+   ===================================================== */
+
+body.pagina-login {
+    background: #f5f6f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.barra-operador {
+    background: #e1b81c;
+    padding: 12px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+main.login-main {
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 30px 20px;
 }
 
-.logo-uncaus {
-    max-height: 65px; /* Limita la altura para que encaje con la altura de 110px del header */
-    width: auto; /* Mantiene la proporción original de la imagen */
-    object-fit: contain;
+.login-card {
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 14px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e2e2;
+}
+
+.login-card h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 500;
+    color: #222;
+    text-align: center;
+}
+
+.login-card p.subtitulo {
+    margin: 0 0 24px 0;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+.login-card label {
+    color: #333;
+}
+
+.login-card input {
+    padding: 11px 12px;
+}
+
+.alerta-error {
+    background: #f8d7da;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+.alerta-error ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.btn-ingresar {
+    width: 100%;
+    background: #189bd0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.btn-ingresar:hover {
+    background: #1382af;
+}
+
+/* =====================================================
+   PANEL DEL OPERADOR DE BIENESTAR ESTUDIANTIL
+   ===================================================== */
+
+.operador-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.icono-usuario {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #bd9810;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.acciones-barra {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-barra {
+    background: #bd9810;
+    color: white;
+    text-decoration: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: normal;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-barra:hover {
+    background: #a3820b;
+}
+
+.panel-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 45px;
+    align-items: start;
+}
+
+.titulo-seccion {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 20px 0;
+}
+
+.panel-operador .tarjeta-solicitud {
+    background: #dfdfdf;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: none;
+    position: static;
+}
+
+.panel-operador .tarjeta-datos p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.panel-operador .tarjeta-datos .id-solicitud {
+    font-size: 15px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 8px;
+}
+
+.tarjeta-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.estado-tag {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.tag-pendiente {
+    background: #e6969c;
+    color: #6d1b22;
+}
+
+.tag-listo {
+    background: #9bd6b4;
+    color: #1b6339;
+}
+
+.panel-operador .btn-revisar {
+    position: static;
+    background: #c9931b;
+    color: white;
+    text-decoration: none;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.panel-operador .btn-revisar:hover {
+    background: #ad7d14;
+}
+
+.contenedor-historial {
+    background: #dfdfdf;
+    border-radius: 16px;
+    padding: 20px;
+    min-height: 470px;
+}
+
+.buscador-historial {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.buscador-historial input {
+    border-radius: 20px;
+    padding-right: 40px;
+    border: none;
+}
+
+.buscador-historial button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    color: #555;
+}
+
+.item-historial {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alerta-exito {
+    background: #eaf6fc;
+    border: 1px solid #189bd0;
+    color: #0c5460;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* =====================================================
+   REGISTRO (NUEVO OPERADOR Y NUEVO COORDINADOR)
+   ===================================================== */
+
+main.registro-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px 60px;
+    margin: 0 auto;
+}
+
+.titulo-registro {
+    color: #189bd0;
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 14px 0;
+    text-align: center;
+}
+
+.card-azul {
+    background: #1496cf;
+    width: 100%;
+    max-width: 470px;
+    padding: 24px 28px 30px;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.card-azul .campo {
+    margin-bottom: 16px;
+}
+
+.card-azul .campo label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: normal;
+}
+
+.card-azul .campo input,
+.card-azul .campo select {
+    width: 100%;
+    height: 40px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 7px;
+    font-size: 15px;
+    background: #ededed;
+    color: #222;
+}
+
+.card-azul .campo input:focus,
+.card-azul .campo select:focus {
+    outline: 2px solid #ffffff;
+    background: #ffffff;
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.card-azul .password-wrapper input {
+    padding-right: 44px;
+}
+
+.btn-ojo {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.btn-ojo:hover {
+    color: #222;
+}
+
+.telefono-fila {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #ffffff;
+}
+
+.prefijo-pais {
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.card-azul .input-tel-corto {
+    width: 68px !important;
+    text-align: center;
+}
+
+.card-azul .input-tel-largo {
+    width: 105px !important;
+    text-align: center;
+}
+
+.firma-box {
+    width: 100%;
+    max-width: 350px;
+    height: 175px;
+    background: #d9d9d9;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666 !important;
+    cursor: pointer;
+    border: 2px dashed transparent;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.firma-box:hover {
+    background: #e2e2e2;
+    border-color: #ffffff;
+}
+
+.firma-box span {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #666;
+}
+
+.acciones-card {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancelar {
+    background: #414d51;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 7px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-cancelar:hover {
+    background: #313a3d;
+}
+
+.btn-guardar {
+    background: #e1b81c;
+    color: #ffffff;
+    padding: 10px 24px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-guardar:hover {
+    background: #c9a314;
+}
+
+@media (max-width: 700px) {
+    header h1 {
+        font-size: 20px;
+    }
+
+    .logo-placeholder {
+        width: 100px;
+    }
+
+    .logo-uncaus {
+        max-height: 48px;
+    }
+
+    .calendario-contenedor,
+    .panel-grid {
+        grid-template-columns: 1fr;
+    }
 }
