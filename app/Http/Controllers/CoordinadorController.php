@@ -10,6 +10,19 @@ use Illuminate\Support\Facades\Hash;
 
 class CoordinadorController extends Controller
 {
+
+    /**
+     * Agrega cabeceras anti-caché para impedir que el botón "Volver atrás"
+     * del navegador muestre vistas protegidas tras cerrar sesión.
+     */
+    private function sinCache($vista)
+    {
+        return response($vista)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sat, 01 Jan 1990 00:00:00 GMT');
+    }
+
     /**
      * Muestra la pantalla de login para el Coordinador.
      */
@@ -19,7 +32,7 @@ class CoordinadorController extends Controller
             return redirect()->route('coordinador.dashboard');
         }
 
-        return view('coordinador.login');
+        return $this->sinCache(view('coordinador.login'));
     }
 
     /**
@@ -59,11 +72,13 @@ class CoordinadorController extends Controller
     }
 
     /**
-     * Cierra la sesión del Coordinador.
+     * Cierra la sesión del Coordinador e invalida la sesión activa.
      */
-    public function logout()
+    public function logout(Request $request)
     {
         session()->forget(['coordinador_id', 'coordinador_nombre']);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('coordinador.login');
     }
@@ -87,8 +102,7 @@ class CoordinadorController extends Controller
         // Buscamos los formularios cuya carrera/área coincida con la del coordinador logueado
         $solicitudesPendientes = Formulario::where('carrera', $coordinador->carrera)->whereIn('estado', ['pendiente', 'avalado/listo'])->get();
 
-        return view('coordinador.index', compact('coordinador', 'solicitudesPendientes'));
-    }
+        return $this->sinCache(view('coordinador.index', compact('coordinador', 'solicitudesPendientes')));    }
 
     /**
      * Muestra la pantalla de revisión de una solicitud específica por su ID.
@@ -101,7 +115,7 @@ class CoordinadorController extends Controller
 
         $formulario = Formulario::with(['fechas', 'estudiantes', 'profesores'])->findOrFail($id);
 
-        return view('coordinador.revisar', compact('formulario'));
+        return $this->sinCache(view('coordinador.revisar', compact('formulario')));
     }
 
     /**
@@ -156,8 +170,7 @@ class CoordinadorController extends Controller
             return redirect()->route('operador.login');
         }
 
-        return view('operador.registrar_coordinador', compact('operador'));
-    }
+        return $this->sinCache(view('coordinador.index', compact('coordinador', 'solicitudesPendientes')));    }
 
     /**
      * Guarda un nuevo Coordinador en la tabla coordinador (ejecutado por el Operador de BE).

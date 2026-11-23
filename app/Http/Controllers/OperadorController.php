@@ -10,6 +10,18 @@ use Illuminate\Support\Facades\Hash;
 class OperadorController extends Controller
 {
     /**
+     * Agrega cabeceras anti-caché para impedir que el botón "Volver atrás"
+     * del navegador muestre vistas protegidas tras cerrar sesión.
+     */
+    private function sinCache($vista)
+    {
+        return response($vista)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sat, 01 Jan 1990 00:00:00 GMT');
+    }
+
+    /**
      * Se muestra pantalla login para Operador de Bienestar Estudiantil.
      */
     public function showLogin()
@@ -17,7 +29,7 @@ class OperadorController extends Controller
         if (session()->has('operador_id')) {
             return redirect()->route('operador.index');
         }
-        return view('operador.login');
+        return $this->sinCache(view('operador.login'));
     }
 
     /**
@@ -44,6 +56,7 @@ class OperadorController extends Controller
                 ->withInput($request->only('correo'));
         }
 
+        $request->session()->regenerate();
         session([
             'operador_id' => $operador->id_operador_de_BE,
             'operador_nombre' => $operador->nombre,
@@ -53,11 +66,14 @@ class OperadorController extends Controller
     }
 
     /**
-     * Cierra la sesión del Operador de Bienestar Estudiantil.
+     * Cierra la sesión del Operador de Bienestar Estudiantil e invalida la sesión.
      */
-    public function logout()
+    public function logout(Request $request)
     {
         session()->forget(['operador_id', 'operador_nombre']);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('operador.login');
     }
 
@@ -77,7 +93,7 @@ class OperadorController extends Controller
             return redirect()->route('operador.login');
         }
 
-        return view('operador.registrar', compact('operador'));
+        return $this->sinCache(view('operador.registrar', compact('operador')));
     }
 
     /**
@@ -161,7 +177,7 @@ class OperadorController extends Controller
 
         $historial = $historialQuery->orderBy('id_formulario', 'desc')->get();
 
-        return view('operador.index', compact('pendientes', 'historial', 'busqueda', 'operador'));
+        return $this->sinCache(view('operador.index', compact('pendientes', 'historial', 'busqueda', 'operador')));
     }
 
     /**
@@ -187,7 +203,7 @@ class OperadorController extends Controller
             'profesores'
         ])->findOrFail($id);
 
-        return view('operador.show', compact('formulario', 'operador'));
+        return $this->sinCache(view('operador.show', compact('formulario', 'operador')));
     }
 
     /**
