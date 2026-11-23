@@ -170,8 +170,8 @@ class CoordinadorController extends Controller
             return redirect()->route('operador.login');
         }
 
-        return $this->sinCache(view('coordinador.index', compact('coordinador', 'solicitudesPendientes')));    }
-
+          return $this->sinCache(view('operador.registrar_coordinador', compact('operador')));
+    }
     /**
      * Guarda un nuevo Coordinador en la tabla coordinador (ejecutado por el Operador de BE).
      */
