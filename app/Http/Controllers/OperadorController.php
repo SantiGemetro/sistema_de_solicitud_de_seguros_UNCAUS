@@ -34,26 +34,22 @@ class OperadorController extends Controller
 
         $credencialesValidas = $operador && (
             $operador->contraseña === $request->contraseña ||
-            (str_starts_with($operador->contraseña, '$2y$') &&
+            (str_starts_with((string) $operador->contraseña, '$2y$') &&
             Hash::check($request->contraseña, $operador->contraseña))
         );
-        // if ($operador && Hash::check($request->password, $operador->password)) {
-        //     session(['operador_id' => $operador->id]);
-        //     return redirect()->route('operador.index');
-        // }
 
-        if(!$credencialesValidas) {
+        if (!$credencialesValidas) {
             return back()
-            ->withErrors(['correo' => 'Correo o contraseña incorrectos.'])
-            ->withInput($request->only('correo'));
+                ->withErrors(['correo' => 'Correo o contraseña incorrectos.'])
+                ->withInput($request->only('correo'));
         }
+
         session([
             'operador_id' => $operador->id_operador_de_BE,
             'operador_nombre' => $operador->nombre,
         ]);
 
         return redirect()->route('operador.index');
-
     }
 
     /**
@@ -84,7 +80,6 @@ class OperadorController extends Controller
         return view('operador.registrar', compact('operador'));
     }
 
-
     /**
      * Alias por compatibilidad si se llama a create().
      */
@@ -92,7 +87,6 @@ class OperadorController extends Controller
     {
         return $this->registrar();
     }
-
 
     /**
      * Guarda un nuevo perfil de Operador de BE en la tabla operador_de_be.
@@ -122,14 +116,11 @@ class OperadorController extends Controller
             ->with('success', "El perfil del operador {$nuevoOperador->nombre} fue registrado con éxito.");
     }
 
-
-
     /**
      * Panel principal del Operador de Bienestar Estudiantil.
      */
     public function index(Request $request)
     {
-        // Agrego verificación de sesión para el operador
         if (!session()->has('operador_id')) {
             return redirect()->route('operador.login');
         }
@@ -141,30 +132,29 @@ class OperadorController extends Controller
             return redirect()->route('operador.login');
         }
 
-        // Captura el término de búsqueda desde la solicitud
         $busqueda = $request->input('buscar');
 
-        // 1. Solicitudes en curso (Pendientes de aval o ya avaladas/listas para revisar)
+        // 1. Solicitudes en curso ('pendiente' o 'avalado/listo')
         $pendientes = Formulario::with(['solicitante'])
             ->withCount(['estudiantes', 'profesores'])
-            ->whereIn('estado', ['PENDIENTE_AVAL', 'AVALADO'])
+            ->whereIn('estado', ['pendiente', 'avalado/listo', 'PENDIENTE_AVAL', 'AVALADO'])
             ->orderBy('id_formulario', 'desc')
             ->get();
 
-        // 2. Historial de solicitudes admitidas (Aceptadas o Rechazadas) con filtro de búsqueda
+        // 2. Historial de solicitudes admitidas ('enviado') con filtro de búsqueda
         $historialQuery = Formulario::with(['solicitante', 'fechas'])
             ->withCount(['estudiantes', 'profesores'])
-            ->whereIn('estado', ['ACEPTADO', 'RECHAZADO']);
+            ->whereIn('estado', ['enviado', 'ACEPTADO', 'RECHAZADO']);
 
         if (!empty($busqueda)) {
             $historialQuery->where(function ($q) use ($busqueda) {
                 $q->where('carrera', 'LIKE', "%{$busqueda}%")
                   ->orWhere('actividad', 'LIKE', "%{$busqueda}%")
                   ->orWhereHas('solicitante', function ($sq) use ($busqueda) {
-                      $sq->where('correo', 'LIKE', "%{$busqueda}%");
+                      $sq->where('correo_solicitante', 'LIKE', "%{$busqueda}%");
                   })
                   ->orWhereHas('fechas', function ($fq) use ($busqueda) {
-                      $fq->where('fecha_inicio', 'LIKE', "%{$busqueda}%");
+                      $fq->where('fecha', 'LIKE', "%{$busqueda}%");
                   });
             });
         }
@@ -172,7 +162,6 @@ class OperadorController extends Controller
         $historial = $historialQuery->orderBy('id_formulario', 'desc')->get();
 
         return view('operador.index', compact('pendientes', 'historial', 'busqueda', 'operador'));
-
     }
 
     /**
@@ -180,7 +169,6 @@ class OperadorController extends Controller
      */
     public function show($id)
     {
-        // Agrego verificación de sesión para el operador
         if (!session()->has('operador_id')) {
             return redirect()->route('operador.login');
         }
@@ -194,7 +182,6 @@ class OperadorController extends Controller
 
         $formulario = Formulario::with([
             'solicitante',
-            'coordinadorAvala',
             'fechas',
             'estudiantes',
             'profesores'
@@ -204,17 +191,16 @@ class OperadorController extends Controller
     }
 
     /**
-     * Actualiza el estado del formulario (Aceptar / Rechazar).
+     * Actualiza el estado del formulario sin depender de atributos extra en Formulario.php.
      */
     public function actualizarEstado(Request $request, $id)
     {
-        // Agrego verificación de sesión para el operador
         if (!session()->has('operador_id')) {
             return redirect()->route('operador.login');
         }
 
         $request->validate([
-            'estado' => 'required|in:ACEPTADO,RECHAZADO,PENDIENTE_AVAL,AVALADO',
+            'estado' => 'required|in:pendiente,avalado/listo,enviado',
         ]);
 
         $formulario = Formulario::findOrFail($id);
@@ -223,6 +209,6 @@ class OperadorController extends Controller
 
         return redirect()
             ->route('operador.index')
-            ->with('success', "El estado de la solicitud {$formulario->codigo} fue actualizado a {$request->estado}.");
+            ->with('success', "El estado de la solicitud #000{$formulario->id_formulario} fue actualizado a {$request->estado}.");
     }
 }

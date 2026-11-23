@@ -29,13 +29,13 @@ class Formulario extends Model
         );
     }
     public function fechas()
-{
-    return $this->hasMany( //un form tiene varias fechas
-        FechasFormulario::class,
-        'id_formulario',
-        'id_formulario'
-    );
-}
+    {
+        return $this->hasMany( //un form tiene varias fechas
+            FechasFormulario::class,
+            'id_formulario',
+            'id_formulario'
+        );
+    }
     public function estudiantes()
     {
         return $this->belongsToMany(
