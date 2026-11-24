@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Formulario;
 use App\Models\Operador;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -207,7 +208,8 @@ class OperadorController extends Controller
     }
 
     /**
-     * Actualiza el estado del formulario sin depender de atributos extra en Formulario.php.
+     * Actualiza el estado del formulario.
+     * Si se acepta y envía ('enviado'), muestra el mensaje con la opción de descargar el PDF.
      */
     public function actualizarEstado(Request $request, $id)
     {
@@ -223,8 +225,42 @@ class OperadorController extends Controller
         $formulario->estado = $request->estado;
         $formulario->save();
 
+        $numero = str_pad((string) $formulario->id_formulario, 4, '0', STR_PAD_LEFT);
+
+        if ($request->estado === 'enviado') {
+            return redirect()
+                ->route('operador.show', $formulario->id_formulario)
+                ->with('pdf_listo', true)
+                ->with('success', "La solicitud #{$numero} fue aceptada y enviada. Ya puedes descargar el documento PDF para presentar en la aseguradora.");
+        }
+
         return redirect()
             ->route('operador.index')
-            ->with('success', "El estado de la solicitud #000{$formulario->id_formulario} fue actualizado a {$request->estado}.");
+            ->with('success', "El estado de la solicitud #{$numero} fue actualizado a {$request->estado}.");
+    }
+
+    /**
+     * Genera y descarga el documento PDF de nómina listo para la aseguradora.
+     */
+    public function descargarPdf($id)
+    {
+        if (!session()->has('operador_id')) {
+            return redirect()->route('operador.login');
+        }
+
+        $formulario = Formulario::with([
+            'solicitante',
+            'fechas',
+            'estudiantes',
+            'profesores'
+        ])->findOrFail($id);
+
+        $numero = str_pad((string) $formulario->id_formulario, 4, '0', STR_PAD_LEFT);
+        $referencia = '#SEG-' . date('Y') . '-' . $numero;
+
+        $pdf = Pdf::loadView('operador.pdf_nomina', compact('formulario', 'referencia'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("Anexo_Nomina_Solicitud_{$numero}.pdf");
     }
 }

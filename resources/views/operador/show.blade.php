@@ -35,6 +35,20 @@
 </div>
 
 <main class="operador-show">
+    @if(session('pdf_listo') || session('success'))
+        <div class="alerta-exito" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <span>{{ session('success') }}</span>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a href="{{ route('operador.pdf', $formulario->id_formulario) }}" class="btn btn-aceptar" style="padding: 9px 18px; font-size: 14px;">
+                    Descargar PDF para aseguradora
+                </a>
+                <a href="{{ route('operador.index') }}" class="btn btn-volver" style="padding: 9px 18px; font-size: 14px;">
+                    Volver al panel
+                </a>
+            </div>
+        </div>
+    @endif
+
     <div class="cabecera-estado">
         <div>
             <h2 style="margin: 0; font-weight: 500;">Solicitud #{{ str_pad($formulario->id_formulario, 4, '0', STR_PAD_LEFT) }}</h2>
@@ -127,6 +141,12 @@
 
     <div class="acciones-revision">
         <a href="{{ route('operador.index') }}" class="btn btn-volver">Volver</a>
+
+        @if($formulario->estado === 'enviado')
+            <a href="{{ route('operador.pdf', $formulario->id_formulario) }}" class="btn btn-aceptar">
+                Descargar PDF para aseguradora
+            </a>
+        @endif
 
         @if($formulario->estado === 'pendiente')
             <form action="{{ route('operador.estado', $formulario->id_formulario) }}" method="POST">

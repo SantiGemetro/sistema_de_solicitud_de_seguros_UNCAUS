@@ -30,6 +30,7 @@ Route::post('/operador/registrar', [OperadorController::class, 'store'])->name('
 Route::get('/operador', [OperadorController::class, 'index'])->name('operador.index');
 Route::get('/operador/formulario/{id}', [OperadorController::class, 'show'])->name('operador.show');
 Route::patch('/operador/formulario/{id}/estado', [OperadorController::class, 'actualizarEstado'])->name('operador.estado');
+Route::get('/operador/formulario/{id}/pdf', [OperadorController::class, 'descargarPdf'])->name('operador.pdf');
 
 // 4. Rutas de Registro de Nuevo Coordinador (dentro del rol de Operador de BE)
 Route::get('/operador/coordinador/registrar', [CoordinadorController::class, 'registrar'])->name('coordinador.registrar');
