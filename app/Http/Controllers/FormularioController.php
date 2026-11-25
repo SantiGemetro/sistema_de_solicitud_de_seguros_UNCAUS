@@ -24,13 +24,18 @@ class FormularioController extends Controller
         try {
             $resultado = DB::transaction(function () use ($request) {
                 $esCoordinador = session()->has('coordinador_id');
+                $esOperador = session()->has('operador_id');
 
-                // Definir estado inicial )
+                // Definir estado inicial según el rol activo
                 $estadoInicial = $esCoordinador ? 'avalado/listo' : 'pendiente';
+                $estadoSeguroInicial = $esCoordinador ? 'confirmado' : 'pendiente_verificacion';
+                $correoSolicitante = $esCoordinador
+                    ? ($request->correo_solicitante ?: session('coordinador_correo'))
+                    : $request->correo_solicitante;
 
                 // 1) Gestionar el Solicitante en sistema_seguros_bd (columna correo_solicitante)
                 $solicitante = Solicitante::firstOrCreate(
-                    ['correo_solicitante' => $request->correo_solicitante]
+                    ['correo_solicitante' => $correoSolicitante]
                 );
 
                 // 2) Crear el Formulario principal
@@ -41,7 +46,9 @@ class FormularioController extends Controller
                     'nom_lugar'      => $request->nom_lugar,
                     'dir_lugar'      => $request->dir_lugar,
                     'id_solicitante' => $solicitante->id_solicitante,
-                    'estado'         => 'pendiente',
+                    'id_coordinador' => $esCoordinador ? session('coordinador_id') : null,
+                    'estado'         => $estadoInicial,
+                    'estado_seguro'  => $estadoSeguroInicial,
                 ]);
 
                 // 3) Procesar y vincular fechas (columnas fecha, hora_inicio, hora_fin de sistema_seguros_bd.sql)
@@ -76,29 +83,34 @@ class FormularioController extends Controller
                     );
                     $formulario->estudiantes()->syncWithoutDetaching([$estudiante->dni_estudiante]);
                 }
-                // Devolvemos los datos que necesitamos fuera
-                // de la transacción.
+
+                // 6) Crear y enviar la verificación dentro de la transacción para que,
+                // si falla la BD o el envío del correo, se haga rollback y no queden formularios duplicados
+                if (!$esCoordinador) {
+                    app(VerificacionCorreoController::class)
+                        ->enviar($formulario->id_formulario);
+                }
+
                 return [
-                    'idFormulario' => $formulario->id_formulario,
-                    'esCoordinador' => $esCoordinador
+                    'idFormulario'  => $formulario->id_formulario,
+                    'esCoordinador' => $esCoordinador,
+                    'esOperador'    => $esOperador,
                 ];
-
             });
-            /// 6) Enviar verificación DESPUÉS de guardar todo
-            if (!$resultado['esCoordinador']) {
-                app(VerificacionCorreoController::class)
-                    ->enviar($resultado['idFormulario']);
-            }
 
-            // 7) Redireccionar segun tipo de usuario
+            // 7) Redireccionar según el rol activo (Coordinador, Operador de BE o Inicio)
             if ($resultado['esCoordinador']) {
                 return redirect()->route('coordinador.dashboard')
                     ->with('success', '¡Solicitud guardada y avalada con éxito!');
             }
 
+            if ($resultado['esOperador']) {
+                return redirect()->route('operador.index')
+                    ->with('success', 'Formulario enviado correctamente. Se envió el enlace de verificación al correo del solicitante.');
+            }
+
             return redirect()->route('inicio')
                 ->with('success', 'Formulario enviado correctamente. Revisá tu correo para verificarlo.');
-
         } catch (\Throwable $e) {
             dd($e->getMessage(), $e->getFile(), $e->getLine());
         }

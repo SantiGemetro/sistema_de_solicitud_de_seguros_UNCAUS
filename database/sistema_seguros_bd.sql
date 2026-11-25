@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-11-2026 a las 07:01:04
+-- Tiempo de generación: 25-11-2026 a las 17:42:42
 -- Versión del servidor: 10.11.16-MariaDB
 -- Versión de PHP: 8.5.12
 
@@ -46,7 +46,8 @@ INSERT INTO `coordinador` (`id_coordinador`, `firma_aclaracion`, `correo`, `cont
 (1, '', 'ana.perez@uncaus.edu.ar', NULL, 'Ana Pérez', '3644123456', 'carrera', 'Licenciatura en Administración'),
 (2, '', 'cordi1@uncaus.edu.ar', 'cordi1', 'cordi1', '+54 9 364 400-0000', 'carrera', 'Licenciatura en Administración'),
 (3, '', 'JPerez@gmail.com', 'asdasd', 'Juan Perez', '+54 9 431 1234-1231', 'carrera', 'Abogacía'),
-(4, '', 'CordiSistemas@gmail.com', 'sis123', 'CordiSis', '+54 9 431 321-582', 'carrera', 'Ingeniería en Sistemas');
+(4, '', 'CordiSistemas@gmail.com', 'sis123', 'CordiSis', '+54 9 431 321-582', 'carrera', 'Ingeniería en Sistemas'),
+(5, 'firmas_coordinadores/fS8jvx9BwuJwDtel6rqOkGD4sU1FiAHtUgPxuUZm.jpg', 'cordiFirma@hotmail.com', 'cordiFirma', 'cordiFirma', '+54 9 123 123-123', 'carrera', 'Contador Público');
 
 -- --------------------------------------------------------
 
@@ -68,6 +69,9 @@ INSERT INTO `estudiante` (`dni_estudiante`, `nombre`, `domicilio`) VALUES
 ('01010', 'Carlos', 'ave5'),
 ('010110', 'Pablo', 'ave 6'),
 ('10131013', 'Lana', 'lock termi'),
+('11111', 'aaaaaa', '234dfwec'),
+('12efwec', '2rf2dc cvsdav', '12312e'),
+('22222233333', 'dasc1dfecwec', 'casdcvsdcasdc'),
 ('38.921.405', 'Benítez, Facundo', '23/8/1995'),
 ('41.556.712', 'Fernández, Gonzalo', '19/2/1999'),
 ('42.384.192', 'Acosta, Mariela', '12/5/1998'),
@@ -123,7 +127,16 @@ INSERT INTO `fechas_formulario` (`id_fecha`, `id_formulario`, `fecha`, `hora_ini
 (26, 15, '2026-11-25', '08:00:00', '12:00:00'),
 (27, 16, '2026-11-24', '08:00:00', '12:00:00'),
 (28, 16, '2026-11-26', '08:00:00', '12:00:00'),
-(29, 17, '2026-11-30', '08:00:00', '11:00:00');
+(29, 17, '2026-11-30', '08:00:00', '11:00:00'),
+(30, 18, '2026-11-25', '08:00:00', '12:00:00'),
+(31, 18, '2026-11-26', '08:00:00', '12:00:00'),
+(32, 18, '2026-11-27', '08:00:00', '12:00:00'),
+(33, 19, '2026-11-30', '08:00:00', '12:00:00'),
+(34, 19, '2026-12-01', '08:00:00', '12:00:00'),
+(35, 19, '2026-12-02', '08:00:00', '12:00:00'),
+(36, 20, '2026-11-30', '08:00:00', '12:00:00'),
+(37, 20, '2026-12-01', '08:00:00', '12:00:00'),
+(38, 20, '2026-12-02', '08:00:00', '12:00:00');
 
 -- --------------------------------------------------------
 
@@ -138,30 +151,35 @@ CREATE TABLE `formulario` (
   `materia` varchar(65) DEFAULT NULL,
   `actividad` varchar(255) NOT NULL,
   `carrera` varchar(65) DEFAULT NULL,
-  `estado` enum('pendiente','avalado/listo','enviado') NOT NULL DEFAULT 'pendiente',
+  `estado` enum('pendiente','avalado/listo','enviado','cancelado') NOT NULL DEFAULT 'pendiente',
   `id_solicitante` int(11) DEFAULT NULL,
-  `id_coordinador` int(11) DEFAULT NULL
+  `id_coordinador` int(11) DEFAULT NULL,
+  `token_acceso` varchar(64) DEFAULT NULL,
+  `estado_seguro` enum('pendiente_verificacion','confirmado','cancelado') NOT NULL DEFAULT 'pendiente_verificacion'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Volcado de datos para la tabla `formulario`
 --
 
-INSERT INTO `formulario` (`id_formulario`, `nom_lugar`, `dir_lugar`, `materia`, `actividad`, `carrera`, `estado`, `id_solicitante`, `id_coordinador`) VALUES
-(2, 'Metalurgicas del sur', 'rrivadavia 123', 'Programación I', 'uwu', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL),
-(5, 'hdjds', 'ldklkskl', 'Programación I', 'hshsh', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL),
-(6, 'eeeeeeeeede', 'ssjdjdjkd', 'Programación I', 'aaa', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL),
-(7, 'asa', 'sasas', 'Sistemas Operativos', 'aaaa', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL),
-(8, 'metal', 'plantaaa', 'Derecho Penal', 'azal', 'Abogacía', 'pendiente', NULL, NULL),
-(9, 'direl', 'locked', 'Programación I', 'actividad', 'Ingeniería en Sistemas', 'pendiente', 4, NULL),
-(10, 'fabrica est', 'direc fab', 'Administración General', 'acti a reali', 'Licenciatura en Administración', 'pendiente', NULL, NULL),
-(11, 'Fabrica de algodon', 'ave 12', 'Auditoría', 'Paseo academico', 'Contador Público', 'enviado', 4, NULL),
-(12, 'Empresa admin', 'ea dire', 'Administración General', 'a', 'Licenciatura en Administración', 'pendiente', 4, NULL),
-(13, 'qweqwe', 'qweqweqw', 'Programación II', 'opiopiopi', 'Ingeniería en Sistemas', 'enviado', 7, NULL),
-(14, 'qweqwe', 'qweqweqw', 'Programación I', 'asdasdasd', 'Ingeniería en Sistemas', 'enviado', 7, NULL),
-(15, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'sssssssssssssssssssssssssssssssssss', 'Derecho Penal', 'cvbbsbdfb', 'Abogacía', 'enviado', 8, NULL),
-(16, 'Oficina de marketing de la municipalidad', 'Sarmiento 551', 'Marketing', 'Salida tecnica', 'Licenciatura en Administración', 'enviado', 8, NULL),
-(17, 'Camara de comercio de la provincia', 'Contitución 2143', 'Derecho Constitucional', 'Visita guiada a camara de comercio', 'Abogacía', 'pendiente', 8, NULL);
+INSERT INTO `formulario` (`id_formulario`, `nom_lugar`, `dir_lugar`, `materia`, `actividad`, `carrera`, `estado`, `id_solicitante`, `id_coordinador`, `token_acceso`, `estado_seguro`) VALUES
+(2, 'Metalurgicas del sur', 'rrivadavia 123', 'Programación I', 'uwu', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL, NULL, 'pendiente_verificacion'),
+(5, 'hdjds', 'ldklkskl', 'Programación I', 'hshsh', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL, NULL, 'pendiente_verificacion'),
+(6, 'eeeeeeeeede', 'ssjdjdjkd', 'Programación I', 'aaa', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL, NULL, 'pendiente_verificacion'),
+(7, 'asa', 'sasas', 'Sistemas Operativos', 'aaaa', 'Ingeniería en Sistemas', 'pendiente', NULL, NULL, NULL, 'pendiente_verificacion'),
+(8, 'metal', 'plantaaa', 'Derecho Penal', 'azal', 'Abogacía', 'pendiente', NULL, NULL, NULL, 'pendiente_verificacion'),
+(9, 'direl', 'locked', 'Programación I', 'actividad', 'Ingeniería en Sistemas', 'pendiente', 4, NULL, NULL, 'pendiente_verificacion'),
+(10, 'fabrica est', 'direc fab', 'Administración General', 'acti a reali', 'Licenciatura en Administración', 'enviado', NULL, 2, NULL, 'pendiente_verificacion'),
+(11, 'Fabrica de algodon', 'ave 12', 'Auditoría', 'Paseo academico', 'Contador Público', 'enviado', 4, 5, NULL, 'pendiente_verificacion'),
+(12, 'Empresa admin', 'ea dire', 'Administración General', 'a', 'Licenciatura en Administración', 'pendiente', 4, NULL, NULL, 'pendiente_verificacion'),
+(13, 'qweqwe', 'qweqweqw', 'Programación II', 'opiopiopi', 'Ingeniería en Sistemas', 'enviado', 7, NULL, NULL, 'pendiente_verificacion'),
+(14, 'qweqwe', 'qweqweqw', 'Programación I', 'asdasdasd', 'Ingeniería en Sistemas', 'enviado', 7, NULL, NULL, 'pendiente_verificacion'),
+(15, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'sssssssssssssssssssssssssssssssssss', 'Derecho Penal', 'cvbbsbdfb', 'Abogacía', 'enviado', 8, NULL, NULL, 'pendiente_verificacion'),
+(16, 'Oficina de marketing de la municipalidad', 'Sarmiento 551', 'Marketing', 'Salida tecnica', 'Licenciatura en Administración', 'enviado', 8, NULL, NULL, 'pendiente_verificacion'),
+(17, 'Camara de comercio de la provincia', 'Contitución 2143', 'Derecho Constitucional', 'Visita guiada a camara de comercio', 'Abogacía', 'pendiente', 8, NULL, NULL, 'pendiente_verificacion'),
+(18, 'qweqweqwe', 'sssssssssssssssssssssssssssssssssss', 'Matemática Financiera', 'asdasdas', 'Contador Público', 'enviado', 7, 5, NULL, 'pendiente_verificacion'),
+(19, 'aaaaaaaaaaa', 'aaaaaaaaaaaaaaa', 'Contabilidad I', 'aaaaaaaaaaaa', 'Contador Público', 'pendiente', 9, NULL, NULL, 'pendiente_verificacion'),
+(20, 'ewcwdcew', 'sssssssssssssssssssssssssssssssssss', 'Contabilidad I', 'ascwwcce', 'Contador Público', 'pendiente', 9, NULL, NULL, 'pendiente_verificacion');
 
 -- --------------------------------------------------------
 
@@ -206,7 +224,16 @@ INSERT INTO `nomina_estudiantes` (`id_formulario`, `dni_estudiante`) VALUES
 (17, '41.556.712'),
 (17, '42.384.192'),
 (17, '44.893.210'),
-(17, '45.102.394');
+(17, '45.102.394'),
+(18, '38.921.405'),
+(18, '41.556.712'),
+(18, '42.384.192'),
+(18, '44.893.210'),
+(18, '45.102.394'),
+(19, '11111'),
+(19, '12efwec'),
+(20, '11111'),
+(20, '22222233333');
 
 -- --------------------------------------------------------
 
@@ -231,7 +258,10 @@ INSERT INTO `nomina_profesores` (`id_formulario`, `dni_profesor`) VALUES
 (14, '39.448.227'),
 (15, '39.448.227'),
 (16, '39.448.227'),
-(17, '39.448.227');
+(17, '39.448.227'),
+(18, '39.448.227'),
+(19, '12312edc'),
+(20, '22222');
 
 -- --------------------------------------------------------
 
@@ -272,6 +302,8 @@ CREATE TABLE `profesor` (
 INSERT INTO `profesor` (`dni_profesor`, `nombre`, `domicilio`) VALUES
 ('01010', 'Carlos', 'ave5'),
 ('010110', 'Pablo', 'ave 6'),
+('12312edc', 'c2d23df2df', '12edcasdc'),
+('22222', 'cefcc12', 'sadcq3fcwe'),
 ('39.448.227', 'Sosa, Matías', '8/7/1994'),
 ('47474747', 'Manu', 'ave 2'),
 ('73736363', 'Fabricio', 'ave 2'),
@@ -286,21 +318,39 @@ INSERT INTO `profesor` (`dni_profesor`, `nombre`, `domicilio`) VALUES
 
 CREATE TABLE `solicitante` (
   `id_solicitante` int(11) NOT NULL,
-  `correo_solicitante` varchar(255) DEFAULT NULL
+  `correo_solicitante` varchar(255) DEFAULT NULL,
+  `verificacion_email_tiempo` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Volcado de datos para la tabla `solicitante`
 --
 
-INSERT INTO `solicitante` (`id_solicitante`, `correo_solicitante`) VALUES
-(2, NULL),
-(3, 'lonely@example.com'),
-(4, 'corre@gmail.com'),
-(5, 'lanita@gmail.com'),
-(6, 'lonely@gmail.com'),
-(7, 'asdasdasd@gmail.com'),
-(8, 'SMatias@gmail.com');
+INSERT INTO `solicitante` (`id_solicitante`, `correo_solicitante`, `verificacion_email_tiempo`) VALUES
+(2, NULL, NULL),
+(3, 'lonely@example.com', NULL),
+(4, 'corre@gmail.com', NULL),
+(5, 'lanita@gmail.com', NULL),
+(6, 'lonely@gmail.com', NULL),
+(7, 'asdasdasd@gmail.com', NULL),
+(8, 'SMatias@gmail.com', NULL),
+(9, 'gemetrosantiago@gmail.com', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `verificaciones_correo`
+--
+
+CREATE TABLE `verificaciones_correo` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `id_formulario` int(11) NOT NULL,
+  `token_hash` varchar(64) NOT NULL,
+  `expira_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `verificado_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Índices para tablas volcadas
@@ -330,6 +380,7 @@ ALTER TABLE `fechas_formulario`
 --
 ALTER TABLE `formulario`
   ADD PRIMARY KEY (`id_formulario`),
+  ADD UNIQUE KEY `formulario_token_acceso_unique` (`token_acceso`),
   ADD KEY `fk_formulario_solicitante1_idx` (`id_solicitante`),
   ADD KEY `fk_formulario_coordinador_idx` (`id_coordinador`);
 
@@ -370,6 +421,14 @@ ALTER TABLE `solicitante`
   ADD PRIMARY KEY (`id_solicitante`);
 
 --
+-- Indices de la tabla `verificaciones_correo`
+--
+ALTER TABLE `verificaciones_correo`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `verificaciones_correo_token_hash_unique` (`token_hash`),
+  ADD KEY `verificaciones_correo_id_formulario_index` (`id_formulario`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -377,19 +436,19 @@ ALTER TABLE `solicitante`
 -- AUTO_INCREMENT de la tabla `coordinador`
 --
 ALTER TABLE `coordinador`
-  MODIFY `id_coordinador` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_coordinador` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `fechas_formulario`
 --
 ALTER TABLE `fechas_formulario`
-  MODIFY `id_fecha` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_fecha` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT de la tabla `formulario`
 --
 ALTER TABLE `formulario`
-  MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT de la tabla `operador_de_be`
@@ -401,7 +460,13 @@ ALTER TABLE `operador_de_be`
 -- AUTO_INCREMENT de la tabla `solicitante`
 --
 ALTER TABLE `solicitante`
-  MODIFY `id_solicitante` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_solicitante` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `verificaciones_correo`
+--
+ALTER TABLE `verificaciones_correo`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas

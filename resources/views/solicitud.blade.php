@@ -285,8 +285,7 @@
 
             @if($esCoordinador)
                 <!-- Si es coordinador, el correo se toma automáticamente de la sesión -->
-                <input type="hidden" name="correo_solicitante" value="{{ session('correo') }}">
-            @else
+                <input type="hidden" name="correo_solicitante" value="{{ session('coordinador_correo') }}">            @else
                 <div class="campo">
                     <label for="correo_solicitante">
                         Indíquenos su correo electrónico para mantenerlo informado

@@ -37,8 +37,8 @@ Route::get('/solicitud/consultar/{token}',[SolicitudController::class, 'consulta
 )->name('solicitud.consultar');
 
 // 3. Rutas del Operador de Bienestar Estudiantil
-Route::get('/operador/login', [OperadorController::class, 'showLogin'])->name('operador.login');
-Route::post('/operador/login', [OperadorController::class, 'login'])->name('operador.login.post');
+Route::get('/operador/login', [AuthController::class, 'showLogin'])->name('operador.login');
+Route::post('/operador/login', [AuthController::class, 'login'])->name('operador.login.post');
 Route::post('/operador/logout', [OperadorController::class, 'logout'])->name('operador.logout');
 Route::get('/operador/registrar', [OperadorController::class, 'registrar'])->name('operador.registrar');
 Route::post('/operador/registrar', [OperadorController::class, 'store'])->name('operador.store');
@@ -46,7 +46,6 @@ Route::get('/operador', [OperadorController::class, 'index'])->name('operador.in
 Route::get('/operador/formulario/{id}', [OperadorController::class, 'show'])->name('operador.show');
 Route::patch('/operador/formulario/{id}/estado', [OperadorController::class, 'actualizarEstado'])->name('operador.estado');
 Route::get('/operador/formulario/{id}/pdf', [OperadorController::class, 'descargarPdf'])->name('operador.pdf');
-
 // 5. Rutas de Registro de Nuevo Coordinador (dentro del rol de Operador de BE)
 Route::get('/operador/coordinador/registrar', [CoordinadorController::class, 'registrar'])->name('coordinador.registrar');
 Route::post('/operador/coordinador/registrar', [CoordinadorController::class, 'store'])->name('coordinador.store');
