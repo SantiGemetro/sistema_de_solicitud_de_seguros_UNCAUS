@@ -218,10 +218,17 @@ class OperadorController extends Controller
         }
 
         $request->validate([
-            'estado' => 'required|in:pendiente,avalado/listo,enviado',
+            'estado' => 'required|in:enviado',
         ]);
 
         $formulario = Formulario::findOrFail($id);
+
+        if ($formulario->estado !== 'avalado/listo') {
+            return redirect()
+                ->route('operador.show', $formulario->id_formulario)
+                ->withErrors(['estado' => 'No se puede aceptar y enviar la solicitud hasta que el coordinador la avale.']);
+        }
+
         $formulario->estado = $request->estado;
         $formulario->save();
 
@@ -261,6 +268,6 @@ class OperadorController extends Controller
         $pdf = Pdf::loadView('operador.pdf_nomina', compact('formulario', 'referencia'))
             ->setPaper('a4', 'portrait');
 
-        return $pdf->download("Anexo_Nomina_Solicitud_{$numero}.pdf");
+        return $pdf->download("Nomina_Solicitud_{$numero}.pdf");
     }
 }

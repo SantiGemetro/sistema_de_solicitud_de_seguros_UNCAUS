@@ -40,7 +40,7 @@
             <span>{{ session('success') }}</span>
             <div style="display: flex; gap: 10px; align-items: center;">
                 <a href="{{ route('operador.pdf', $formulario->id_formulario) }}" class="btn btn-aceptar" style="padding: 9px 18px; font-size: 14px;">
-                    Descargar PDF para aseguradora
+                    Descargar nómina en PDF
                 </a>
                 <a href="{{ route('operador.index') }}" class="btn btn-volver" style="padding: 9px 18px; font-size: 14px;">
                     Volver al panel
@@ -139,31 +139,38 @@
         <input type="email" value="{{ $formulario->solicitante->correo_solicitante ?? 'Sin correo' }}" disabled>
     </div>
 
+    @if($formulario->estado !== 'avalado/listo' && $formulario->estado !== 'enviado')
+        <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px 16px; border-radius: 8px; margin-top: 10px; font-size: 14px;">
+            Se necesita aval del coordinador de <strong>{{ $formulario->carrera ?? $formulario->area ?? 'la carrera/área correspondiente' }}</strong> para poder aceptar y enviar esta solicitud.
+        </div>
+    @endif
+
     <div class="acciones-revision">
         <a href="{{ route('operador.index') }}" class="btn btn-volver">Volver</a>
 
         @if($formulario->estado === 'enviado')
             <a href="{{ route('operador.pdf', $formulario->id_formulario) }}" class="btn btn-aceptar">
-                Descargar PDF para aseguradora
+                Descargar nómina en PDF
             </a>
         @endif
 
-        @if($formulario->estado === 'pendiente')
-            <form action="{{ route('operador.estado', $formulario->id_formulario) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="estado" value="avalado/listo">
-                <button type="submit" class="btn btn-aval">Marcar como Listo (Avalado)</button>
-            </form>
-        @endif
-
-        @if($formulario->estado !== 'enviado')
+        @if($formulario->estado === 'avalado/listo')
             <form action="{{ route('operador.estado', $formulario->id_formulario) }}" method="POST">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="estado" value="enviado">
                 <button type="submit" class="btn btn-aceptar">Aceptar y enviar solicitud</button>
             </form>
+        @elseif($formulario->estado !== 'enviado')
+            <button
+                type="button"
+                class="btn btn-aceptar"
+                disabled
+                title="La solicitud debe ser avalada por el coordinador antes de poder enviarse"
+                style="background: #b0bec5; cursor: not-allowed; opacity: 0.8;"
+            >
+                Aceptar y enviar solicitud
+            </button>
         @endif
     </div>
 </main>

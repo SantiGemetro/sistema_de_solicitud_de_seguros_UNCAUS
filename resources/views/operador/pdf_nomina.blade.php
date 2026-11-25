@@ -238,6 +238,14 @@
     <!-- Datos de cobertura: Fecha de cobertura, Carrera arriba de Materia -->
     <table class="meta-tabla">
         <tr>
+            <td class="meta-label">Carrera:</td>
+            <td>{{ $formulario->carrera ?? 'No aplica' }}</td>
+        </tr>
+        <tr>
+            <td class="meta-label">Materia:</td>
+            <td>{{ $formulario->materia ?? 'No aplica' }}</td>
+        </tr>
+        <tr>
             <td class="meta-label">Fecha de cobertura:</td>
             <td>
                 @forelse($fechasOrdenadas as $f)
@@ -253,14 +261,6 @@
                     Sin fecha registrada
                 @endforelse
             </td>
-        </tr>
-        <tr>
-            <td class="meta-label">Carrera:</td>
-            <td>{{ $formulario->carrera ?? 'No aplica' }}</td>
-        </tr>
-        <tr>
-            <td class="meta-label">Materia:</td>
-            <td>{{ $formulario->materia ?? 'No aplica' }}</td>
         </tr>
     </table>
 
