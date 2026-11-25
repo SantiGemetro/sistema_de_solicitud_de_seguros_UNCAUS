@@ -23,6 +23,16 @@ class Coordinador extends Model
         'firma_aclaracion',
     ];
 
+    //de nuevo la relacion con formulario
+    public function formularios()
+    {
+        return $this->hasMany(
+            Formulario::class,
+            'id_coordinador',
+            'id_coordinador'
+        );
+    }
+
     public function esDeArea()
     {
         return $this->tipo === 'area';

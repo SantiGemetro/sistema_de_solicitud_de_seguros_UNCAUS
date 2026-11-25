@@ -113,13 +113,20 @@ class CoordinadorController extends Controller
             return redirect()->route('coordinador.login');
         }
 
-        $formulario = Formulario::with(['fechas', 'estudiantes', 'profesores'])->findOrFail($id);
+        $coordinador = Coordinador::find(session('coordinador_id'));
 
-        return $this->sinCache(view('coordinador.revisar', compact('formulario')));
+        if (!$coordinador) {
+            session()->forget(['coordinador_id', 'coordinador_nombre']);
+            return redirect()->route('coordinador.login');
+        }
+
+        $formulario = Formulario::with(['fechas', 'estudiantes', 'profesores', 'coordinador'])->findOrFail($id);
+
+        return $this->sinCache(view('coordinador.revisar', compact('formulario', 'coordinador')));
     }
 
     /**
-     * Confirmación de solicitud por parte del Coordinador.
+     * Aval y firma digital de la solicitud por parte del Coordinador.
      */
     public function confirmar(Request $request, $id)
     {
@@ -128,31 +135,59 @@ class CoordinadorController extends Controller
         }
 
         $formulario = Formulario::findOrFail($id);
+        $coordinador = Coordinador::findOrFail(session('coordinador_id'));
 
-        // CASO 1: DESAVALAR LA SOLICITUD
-        if ($request->input('accion') === 'desavalar') {
-
-            $formulario->estado = 'pendiente';
-            $formulario->save();
+        if ($formulario->estado === 'avalado/listo') {
             return redirect()->route('coordinador.dashboard')
-                            ->with('success', 'La solicitud ha vuelto al estado pendiente.');
+                ->with('success', 'Esta solicitud ya se encuentra avalada.');
         }
 
-        // CASO 2: AVALAR Y CONFIRMAR LA SOLICITUD (Requiere firma)
-        $request->validate([
-            'firma' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        if ($request->hasFile('firma')) {
-            $pathFirma = $request->file('firma')->store('firmas_coordinadores', 'public');
-        }
-
-        $formulario->estado = 'avalado/listo'; // Cambia a estado listo
+        $formulario->estado = 'avalado/listo';
+        $formulario->id_coordinador = $coordinador->id_coordinador;
         $formulario->save();
 
         return redirect()->route('coordinador.dashboard')
-            ->with('success', '¡Solicitud confirmada y firmada exitosamente!');
+            ->with('success', '¡Solicitud avalada y firmada exitosamente!');
     }
+
+
+
+    /**
+     * Confirmación de solicitud por parte del Coordinador.
+     * Forma antigua de confirmar la solicitud
+     */
+    // public function confirmar(Request $request, $id)
+    // {
+    //     if (!session()->has('coordinador_id')) {
+    //         return redirect()->route('coordinador.login');
+    //     }
+
+    //     $formulario = Formulario::findOrFail($id);
+
+    //     // CASO 1: DESAVALAR LA SOLICITUD
+    //     if ($request->input('accion') === 'desavalar') {
+
+    //         $formulario->estado = 'pendiente';
+    //         $formulario->save();
+    //         return redirect()->route('coordinador.dashboard')
+    //                         ->with('success', 'La solicitud ha vuelto al estado pendiente.');
+    //     }
+
+    //     // CASO 2: AVALAR Y CONFIRMAR LA SOLICITUD (Requiere firma)
+    //     $request->validate([
+    //         'firma' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    //     ]);
+
+    //     if ($request->hasFile('firma')) {
+    //         $pathFirma = $request->file('firma')->store('firmas_coordinadores', 'public');
+    //     }
+
+    //     $formulario->estado = 'avalado/listo'; // Cambia a estado listo
+    //     $formulario->save();
+
+    //     return redirect()->route('coordinador.dashboard')
+    //         ->with('success', '¡Solicitud confirmada y firmada exitosamente!');
+    // }
 
     /**
      * Muestra la pantalla para registrar un nuevo Coordinador (desde el panel del Operador de BE).
@@ -190,15 +225,12 @@ class CoordinadorController extends Controller
             'cod_area' => 'required|string|max:6',
             'prefijo' => 'required|string|max:6',
             'numero_final' => 'required|string|max:8',
-            'firma_aclaracion' => 'nullable|file|max:4096',
+            'firma_aclaracion' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
         ]);
 
         $telefonoCompleto = '+54 9 ' . trim($request->cod_area) . ' ' . trim($request->prefijo) . '-' . trim($request->numero_final);
 
-        $nombreFirma = '';
-        if ($request->hasFile('firma_aclaracion')) {
-            $nombreFirma = $request->file('firma_aclaracion')->getClientOriginalName();
-        }
+        $pathFirma = $request->file('firma_aclaracion')->store('firmas_coordinadores', 'public');
 
         $nuevoCoordinador = Coordinador::create([
             'nombre' => $request->nombre,
@@ -207,7 +239,7 @@ class CoordinadorController extends Controller
             'correo' => $request->correo,
             'contraseña' => $request->contraseña,
             'telefono' => substr($telefonoCompleto, 0, 20),
-            'firma_aclaracion' => substr($nombreFirma, 0, 45),
+            'firma_aclaracion' => $pathFirma,
         ]);
 
         return redirect()

@@ -16,8 +16,7 @@
     </header>
 
     <main>
-        <!-- Formulario de revisión (con los datos del formulario de prueba) -->
-        <form action="{{ route('coordinador.confirmar', $formulario->id_formulario) }}" method="POST" enctype="multipart/form-data" id="formRevision">
+        <form action="{{ route('coordinador.confirmar', $formulario->id_formulario) }}" method="POST" id="formRevision">
             @csrf
 
             <!-- CARRERA -->
@@ -122,42 +121,48 @@
                 </div>
             </div>
 
-            <!-- CAMPO DE FIRMA Y ACLARACIÓN (OBLIGATORIO PARA EL COORDINADOR) -->
+            <!-- FIRMA DIGITAL DEL COORDINADOR -->
             @if($formulario->estado === 'avalado/listo')
-                <!-- VISTA PREVIA DE LA FIRMA YA CARGADA -->
-                <label><strong>Firma y aclaración guardada</strong></label>
-                <p class="ayuda">Esta solicitud ya fue avalada con la siguiente firma:</p>
+                <div class="campo" style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
+                    <label><strong>Firma y aclaración del aval</strong></label>
+                    <p class="ayuda">Esta solicitud ya fue avalada con la siguiente firma:</p>
 
-                <div style="margin: 15px 0;">
-                    <img src="{{ asset('storage/' . $formulario->firma_aclaracion) }}"
-                        alt="Firma del coordinador"
-                        style="max-width: 300px; height: auto; border: 1px solid #ccc; border-radius: 6px; padding: 5px;">
+                    @if($formulario->coordinador && $formulario->coordinador->firma_aclaracion)
+                        <div style="margin: 15px 0;">
+                            <img src="{{ asset('storage/' . $formulario->coordinador->firma_aclaracion) }}"
+                                 alt="Firma del coordinador"
+                                 style="max-width: 300px; height: auto; border: 1px solid #ccc; border-radius: 6px; padding: 5px;">
+                        </div>
+                    @else
+                        <p class="ayuda" style="color: #b45309;">No se encontró una imagen de firma asociada al coordinador.</p>
+                    @endif
                 </div>
-
-                <!-- Campo oculto para avisar al controlador que la acción es desavalar -->
-                <input type="hidden" name="accion" value="desavalar">
-
             @else
                 <div class="campo" style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
-                    <label for="firma"><strong>Firma y aclaración (Cargar imagen)</strong></label>
-                    <p class="ayuda">Adjunte la imagen con su firma y sello para dar por confirmada la solicitud.</p>
-                    <input type="file" name="firma" id="firma" accept="image/*" required style="border: 2px dashed #189bd0; padding: 20px; background: #f9f9f9;">
+                    <label><strong>Firma y aclaración registrada</strong></label>
+                    @if(isset($coordinador) && $coordinador->firma_aclaracion)
+                        <p class="ayuda">Al confirmar, esta firma quedará vinculada a la solicitud:</p>
+                        <div style="margin: 15px 0;">
+                            <img src="{{ asset('storage/' . $coordinador->firma_aclaracion) }}"
+                                 alt="Firma registrada del coordinador"
+                                 style="max-width: 300px; height: auto; border: 1px solid #ccc; border-radius: 6px; padding: 5px;">
+                        </div>
+                    @else
+                        <p class="ayuda" style="color: #b45309;">Tu perfil de coordinador todavía no tiene una imagen de firma guardada en la base de datos.</p>
+                    @endif
                 </div>
             @endif
 
             <!-- BOTONES FINALES -->
             <div class="acciones">
-                <a href="{{ route('coordinador.dashboard') }}" class="cancelar">
-                    Cancelar
-                </a>
                 @if($formulario->estado === 'avalado/listo')
-                    <input type="hidden" name="accion" value="desavalar">
-                    <!-- BOTÓN DESAVALAR (Naranja/Rojo) -->
-                    <button type="submit" class="enviar" style="background-color: #e06d6d;">
-                        Desavalar
-                    </button>
+                    <a href="{{ route('coordinador.dashboard') }}" class="cancelar">
+                        Volver
+                    </a>
                 @else
-                    <!-- BOTÓN CONFIRMAR (Azul) -->
+                    <a href="{{ route('coordinador.dashboard') }}" class="cancelar">
+                        Cancelar
+                    </a>
                     <button type="submit" class="enviar">
                         Avalar y Confirmar
                     </button>
@@ -169,13 +174,3 @@
 
 </body>
 </html>
-
-<script>
-    document.getElementById('formRevision').addEventListener('submit', function(e) {
-        const inputFirma = document.getElementById('firma');
-        if (!inputFirma.files || inputFirma.files.length === 0) {
-            e.preventDefault();
-            alert('Debe cargar una imagen con su firma y aclaración para poder confirmar la solicitud.');
-        }
-    });
-</script>

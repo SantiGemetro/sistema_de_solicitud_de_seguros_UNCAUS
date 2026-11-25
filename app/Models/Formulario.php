@@ -17,6 +17,7 @@ class Formulario extends Model
         'carrera',
         'materia',
         'id_solicitante',
+        'id_coordinador', //nuevo
         'estado', //nuevo
     ];
 
@@ -28,6 +29,16 @@ class Formulario extends Model
             'id_solicitante'
         );
     }
+    //añado nuevamente la relacion con coordinador
+    public function coordinador()
+    {
+        return $this->belongsTo(
+            Coordinador::class,
+            'id_coordinador',
+            'id_coordinador'
+        );
+    }
+
     public function fechas()
     {
         return $this->hasMany( //un form tiene varias fechas
