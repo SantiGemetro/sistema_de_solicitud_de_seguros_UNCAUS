@@ -23,7 +23,15 @@
             <!-- ESTADO -->
             <div class="campo">
                 <label>Estado de la solicitud</label>
-                <input type="text" value="{{ $formulario->estado }}" disabled>
+                @if($formulario->estado === 'cancelado')
+                    <input type="text" value="{{ $formulario->estado }}" disabled style="background-color: darksalmon;">
+                @elseif($formulario->estado === 'pendiente')
+                    <input type="text" value="Pendiente de aval de director" disabled style="background-color: lightyellow;">
+                @elseif($formulario->estado === 'avalado/listo')
+                    <input type="text" value="Avalado por el director, en espera de envio a la aseguradora" disabled style="background-color: lightgreen;">
+                @elseif($formulario->estado === 'enviado')
+                    <input type="text" value="Enviado a la aseguradora!" disabled style="background-color: #68b368;">
+                @endif
             </div>
 
             <!-- CARRERA -->
@@ -128,16 +136,66 @@
                 </div>
             </div>
 
-            <!-- BOTONES FINALES -->
-            <div class="acciones">
-                <a class="cancelar">
-                    Cancelar Solicitud
-                </a>
-            </div>
-
-        </form>
+            <!-- BOTON CANCELAR -->
+            
     </main>
+    <section class="tarjeta">
 
+        <h2>Cancelar solicitud</h2>
+
+            @if(session('success'))
+                <div style="
+                    background-color:#d4edda;
+                    color:#246b38;
+                    padding:15px;
+                    border-radius:10px;
+                    margin-bottom:18px;
+                ">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div style="
+                    background-color:#f8d7da;
+                    color:#842029;
+                    padding:15px;
+                    border-radius:10px;
+                    margin-bottom:18px;
+                ">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if($formulario->estado === 'cancelado')
+
+                <p style="color:#842029; font-weight:bold;">
+                    Esta solicitud se encuentra cancelada.
+                </p>
+
+            @else
+
+                <p class="label" style="color: gray;">
+                    Si necesitás cancelar esta solicitud, podés hacerlo
+                    siempre que quede al menos un día hábil completo
+                    antes de la próxima fecha de la actividad.
+                </p>
+
+                <form
+                    action="{{ route('solicitud.cancelar', ['token' => $token]) }}"
+                    method="POST"
+                    onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta solicitud?');"
+                >
+                    @csrf
+
+                    <button type="submit", class="cancelar">
+                        Cancelar Solicitud
+                    </button>
+                </form>
+
+            @endif
+
+    </section>
 </body>
 </html>
 

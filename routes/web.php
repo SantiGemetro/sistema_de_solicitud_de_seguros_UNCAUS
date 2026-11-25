@@ -23,13 +23,15 @@ Route::get('/solicitud', [FormularioController::class, 'create'])->name('formula
 Route::post('/solicitar-seguro', [FormularioController::class, 'store'])->name('Formulario.store');
 Route::post('/solicitud', [FormularioController::class, 'store'])->name('formulario.store');
 
-//(añadidio) rutas para verificar el correo
+//(añadidio) rutas para verificar el correo y consultar solicitud
 Route::get('/verificar-correo/{id}/{token}',[VerificacionCorreoController::class, 'verificar'] //recibe el enlace
 )->middleware('throttle:6,1')
  ->name('verificar.correo');
 
 Route::get('/solicitud/consultar/{token}',[SolicitudController::class, 'consultar'] //permite consultar mediante token privado
 )->name('solicitud.consultar');
+//(añadidio) ruta para cancelar solicitud mediante token privado
+Route::post('/solicitud/cancelar/{token}',[SolicitudController::class, 'cancelar'])->name('solicitud.cancelar');
 
 // 3. Rutas del Operador de Bienestar Estudiantil
 Route::get('/operador/login', [OperadorController::class, 'showLogin'])->name('operador.login');
