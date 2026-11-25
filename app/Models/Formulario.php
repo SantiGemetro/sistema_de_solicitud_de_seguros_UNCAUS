@@ -18,6 +18,8 @@ class Formulario extends Model
         'materia',
         'id_solicitante',
         'estado', //nuevo
+        'estado_seguro', //estado del email
+        'token_acceso', //para consultar como solicitante no registrado
     ];
 
     public function solicitante()

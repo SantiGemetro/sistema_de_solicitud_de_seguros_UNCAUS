@@ -8,6 +8,7 @@ use App\Models\Estudiante;
 use App\Models\Profesor;
 use App\Models\Solicitante;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\VerificacionCorreoController;
 
 class FormularioController extends Controller
 {
@@ -21,10 +22,10 @@ class FormularioController extends Controller
     public function store(StoreFormularioRequest $request)
     {
         try {
-            return DB::transaction(function () use ($request) {
+            $resultado = DB::transaction(function () use ($request) {
                 $esCoordinador = session()->has('coordinador_id');
 
-                // Definir estado inicial
+                // Definir estado inicial )
                 $estadoInicial = $esCoordinador ? 'avalado/listo' : 'pendiente';
 
                 // 1) Gestionar el Solicitante en sistema_seguros_bd (columna correo_solicitante)
@@ -75,17 +76,30 @@ class FormularioController extends Controller
                     );
                     $formulario->estudiantes()->syncWithoutDetaching([$estudiante->dni_estudiante]);
                 }
-
-                // Redirección inteligente según quién haya creado la solicitud
-                if ($esCoordinador) {
-                    return redirect()->route('coordinador.dashboard')
-                                    ->with('success', '¡Solicitud guardada y avalada con éxito!');
-                }
-                // 6) Redireccionar con éxito a la pantalla de inicio
-                return redirect()->route('inicio')
-                    ->with('success', 'Formulario enviado correctamente, estado: pendiente');
+                // Devolvemos los datos que necesitamos fuera
+                // de la transacción.
+                return [
+                    'idFormulario' => $formulario->id_formulario,
+                    'esCoordinador' => $esCoordinador
+                ];
+                
             });
-        } catch (\Exception $e) {
+            /// 6) Enviar verificación DESPUÉS de guardar todo
+            if (!$resultado['esCoordinador']) {
+                app(VerificacionCorreoController::class)
+                    ->enviar($resultado['idFormulario']);
+            }
+
+            // 7) Redireccionar segun tipo de usuario
+            if ($resultado['esCoordinador']) {
+                return redirect()->route('coordinador.dashboard')
+                    ->with('success', '¡Solicitud guardada y avalada con éxito!');
+            }
+
+            return redirect()->route('inicio')
+                ->with('success', 'Formulario enviado correctamente. Revisá tu correo para verificarlo.');
+
+        } catch (\Throwable $e) {
             dd($e->getMessage(), $e->getFile(), $e->getLine());
         }
     }

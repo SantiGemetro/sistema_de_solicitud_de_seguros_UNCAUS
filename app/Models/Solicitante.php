@@ -10,7 +10,7 @@ class Solicitante extends Model
     protected $primaryKey = 'id_solicitante'; // En sistema_seguros_bd.sql se llama id_solicitante
     public $timestamps = false;
 
-    protected $fillable = ['correo_solicitante'];
+    protected $fillable = ['correo_solicitante', 'verificacion_email_tiempo',];
 
     // Relación con el formulario
     public function formularios()

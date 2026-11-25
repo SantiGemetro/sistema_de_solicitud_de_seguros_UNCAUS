@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\CoordinadorController;
 use App\Http\Controllers\OperadorController;
+use App\Http\Controllers\VerificacionCorreoController;
+use App\Http\Controllers\SolicitudController;
 
 // 1. Pantalla principal de inicio (Prueba_Pantalla_Inicial)
 Route::get('/', function () {
@@ -20,6 +22,14 @@ Route::get('/solicitar-seguro', [FormularioController::class, 'create'])->name('
 Route::get('/solicitud', [FormularioController::class, 'create'])->name('formulario.create');
 Route::post('/solicitar-seguro', [FormularioController::class, 'store'])->name('Formulario.store');
 Route::post('/solicitud', [FormularioController::class, 'store'])->name('formulario.store');
+
+//(añadidio) rutas para verificar el correo
+Route::get('/verificar-correo/{id}/{token}',[VerificacionCorreoController::class, 'verificar'] //recibe el enlace
+)->middleware('throttle:6,1')
+ ->name('verificar.correo');
+
+Route::get('/solicitud/consultar/{token}',[SolicitudController::class, 'consultar'] //permite consultar mediante token privado
+)->name('solicitud.consultar');
 
 // 3. Rutas del Operador de Bienestar Estudiantil
 Route::get('/operador/login', [OperadorController::class, 'showLogin'])->name('operador.login');
