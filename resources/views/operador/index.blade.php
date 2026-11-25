@@ -74,36 +74,38 @@
             </div>
         </section>
 
-        <!-- Columna Derecha: Historial de solicitudes admitidas -->
+        <!-- Columna Derecha: Historial de solicitudes admitidas (deslizable con buscador fijo arriba) -->
         <section>
-            <h2 class="titulo-seccion">Historial de solicitudes admitidas</h2>
-            <div class="contenedor-historial">
-                <form action="{{ route('operador.index') }}" method="GET" class="buscador-historial">
+            <h2 class="titulo-seccion">Historial de solicitudes admitidas ({{ $historial->count() }})</h2>
+            <div class="contenedor-historial" style="display: flex; flex-direction: column; height: 700px; max-height: 700px; overflow: hidden;">
+                <form action="{{ route('operador.index') }}" method="GET" class="buscador-historial" style="flex-shrink: 0;">
                     <input type="text" name="buscar" value="{{ $busqueda }}" placeholder="Carrera/Area/Solicitante/fecha">
                     <button type="submit">🔍</button>
                 </form>
 
-                @forelse($historial as $item)
-                    <div class="item-historial">
-                        <div>
-                            <strong>#{{ str_pad($item->id_formulario, 4, '0', STR_PAD_LEFT) }}</strong>
-                            <div style="font-size: 13px; color: #555; margin-top: 3px;">
-                                {{ $item->solicitante->correo_solicitante ?? 'Sin correo' }}
+                <div class="lista-historial" style="flex: 1; overflow-y: auto; padding-right: 8px;">
+                    @forelse($historial as $item)
+                        <div class="item-historial">
+                            <div>
+                                <strong>#{{ str_pad($item->id_formulario, 4, '0', STR_PAD_LEFT) }}</strong>
+                                <div style="font-size: 13px; color: #555; margin-top: 3px;">
+                                    {{ $item->solicitante->correo_solicitante ?? 'Sin correo' }}
+                                </div>
+                                <div style="font-size: 12px; color: #888;">
+                                    {{ $item->carrera ?? $item->actividad }}
+                                </div>
                             </div>
-                            <div style="font-size: 12px; color: #888;">
-                                {{ $item->carrera ?? $item->actividad }}
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="estado-tag tag-listo">ENVIADO</span>
+                                <a href="{{ route('operador.show', $item->id_formulario) }}" class="btn-revisar">Ver</a>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="estado-tag tag-listo">ENVIADO</span>
-                            <a href="{{ route('operador.show', $item->id_formulario) }}" class="btn-revisar">Ver</a>
-                        </div>
-                    </div>
-                @empty
-                    <p style="text-align: center; color: #666; font-size: 14px; margin-top: 40px;">
-                        Sin registros en el historial.
-                    </p>
-                @endforelse
+                    @empty
+                        <p style="text-align: center; color: #666; font-size: 14px; margin-top: 40px;">
+                            Sin registros en el historial.
+                        </p>
+                    @endforelse
+                </div>
             </div>
         </section>
     </div>
@@ -128,3 +130,4 @@
 </script>
 
 </body>
+</html>

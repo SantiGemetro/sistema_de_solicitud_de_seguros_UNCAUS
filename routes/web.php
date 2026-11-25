@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\CoordinadorController;
 use App\Http\Controllers\OperadorController;
@@ -14,16 +15,20 @@ Route::get('/inicio', function () {
     return redirect()->route('inicio');
 });
 
-// 2. Rutas del formulario de solicitud de seguro
+// 2. Login unificado (Coordinadores y Operadores de Bienestar Estudiantil)
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+// 3. Rutas del formulario de solicitud de seguro
 //por que estan duplicadas? xd
 Route::get('/solicitar-seguro', [FormularioController::class, 'create'])->name('Formulario.create');
 Route::get('/solicitud', [FormularioController::class, 'create'])->name('formulario.create');
 Route::post('/solicitar-seguro', [FormularioController::class, 'store'])->name('Formulario.store');
 Route::post('/solicitud', [FormularioController::class, 'store'])->name('formulario.store');
 
-// 3. Rutas del Operador de Bienestar Estudiantil
-Route::get('/operador/login', [OperadorController::class, 'showLogin'])->name('operador.login');
-Route::post('/operador/login', [OperadorController::class, 'login'])->name('operador.login.post');
+// 4. Rutas del Operador de Bienestar Estudiantil
+Route::get('/operador/login', [AuthController::class, 'showLogin'])->name('operador.login');
+Route::post('/operador/login', [AuthController::class, 'login'])->name('operador.login.post');
 Route::post('/operador/logout', [OperadorController::class, 'logout'])->name('operador.logout');
 Route::get('/operador/registrar', [OperadorController::class, 'registrar'])->name('operador.registrar');
 Route::post('/operador/registrar', [OperadorController::class, 'store'])->name('operador.store');
@@ -32,13 +37,13 @@ Route::get('/operador/formulario/{id}', [OperadorController::class, 'show'])->na
 Route::patch('/operador/formulario/{id}/estado', [OperadorController::class, 'actualizarEstado'])->name('operador.estado');
 Route::get('/operador/formulario/{id}/pdf', [OperadorController::class, 'descargarPdf'])->name('operador.pdf');
 
-// 4. Rutas de Registro de Nuevo Coordinador (dentro del rol de Operador de BE)
+// 5. Rutas de Registro de Nuevo Coordinador (dentro del rol de Operador de BE)
 Route::get('/operador/coordinador/registrar', [CoordinadorController::class, 'registrar'])->name('coordinador.registrar');
 Route::post('/operador/coordinador/registrar', [CoordinadorController::class, 'store'])->name('coordinador.store');
 
-// 5. Rutas de Login y Pantalla Principal del Coordinador (coordinador/index.blade.php)
-Route::get('/coordinador/login', [CoordinadorController::class, 'showLogin'])->name('coordinador.login');
-Route::post('/coordinador/login', [CoordinadorController::class, 'login'])->name('coordinador.login.post');
+// 6. Rutas del Coordinador
+Route::get('/coordinador/login', [AuthController::class, 'showLogin'])->name('coordinador.login');
+Route::post('/coordinador/login', [AuthController::class, 'login'])->name('coordinador.login.post');
 Route::post('/coordinador/logout', [CoordinadorController::class, 'logout'])->name('coordinador.logout');
 Route::get('/coordinador', [CoordinadorController::class, 'index'])->name('coordinador.dashboard');
 Route::get('/coordinador/revisar/{id}', [CoordinadorController::class, 'show'])->name('coordinador.revisar');

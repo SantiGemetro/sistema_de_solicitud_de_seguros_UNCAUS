@@ -139,6 +139,26 @@
         <input type="email" value="{{ $formulario->solicitante->correo_solicitante ?? 'Sin correo' }}" disabled>
     </div>
 
+    <!-- FIRMA DEL COORDINADOR DE CARRERA O DE ÁREA -->
+    @if($formulario->coordinador && $formulario->coordinador->firma_aclaracion)
+        <div class="campo" style="max-width: 550px; margin-top: 16px;">
+            <label>
+                Firma y aclaración del coordinador
+                ({{ $formulario->coordinador->tipo === 'area' ? 'Área' : 'Carrera' }}: {{ $formulario->coordinador->carrera }})
+            </label>
+            <div style="margin-top: 8px;">
+                <img
+                    src="{{ asset('storage/' . $formulario->coordinador->firma_aclaracion) }}"
+                    alt="Firma del coordinador {{ $formulario->coordinador->nombre }}"
+                    style="max-width: 300px; height: auto; border: 1px solid #ccc; border-radius: 8px; padding: 6px; background: #fff;"
+                >
+            </div>
+            <small style="color: #555; display: block; margin-top: 6px;">
+                Avalado por: <strong>{{ $formulario->coordinador->nombre }}</strong>
+            </small>
+        </div>
+    @endif
+
     @if($formulario->estado !== 'avalado/listo' && $formulario->estado !== 'enviado')
         <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px 16px; border-radius: 8px; margin-top: 10px; font-size: 14px;">
             Se necesita aval del coordinador de <strong>{{ $formulario->carrera ?? $formulario->area ?? 'la carrera/área correspondiente' }}</strong> para poder aceptar y enviar esta solicitud.

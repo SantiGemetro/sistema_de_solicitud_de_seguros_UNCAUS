@@ -23,38 +23,39 @@ class OperadorController extends Controller
     }
 
     /**
-     * Se muestra pantalla login para Operador de Bienestar Estudiantil.
+     * Redirige al login unificado si no hay sesión activa.
      */
     public function showLogin()
     {
         if (session()->has('operador_id')) {
             return redirect()->route('operador.index');
         }
-        return $this->sinCache(view('operador.login'));
+
+        return redirect()->route('login');
     }
 
     /**
-     * Se procesa el login del Operador de Bienestar Estudiantil.
+     * Procesa el login del Operador de Bienestar Estudiantil por nombre de usuario y contraseña.
      */
     public function login(Request $request)
     {
         $request->validate([
-            'correo' => 'required|email',
+            'nombre' => 'required|string',
             'contraseña' => 'required|string',
         ]);
 
-        $operador = Operador::where('correo', $request->correo)->first();
+        $operador = Operador::where('nombre', trim($request->nombre))->first();
 
         $credencialesValidas = $operador && (
             $operador->contraseña === $request->contraseña ||
             (str_starts_with((string) $operador->contraseña, '$2y$') &&
-            Hash::check($request->contraseña, $operador->contraseña))
+                Hash::check($request->contraseña, $operador->contraseña))
         );
 
         if (!$credencialesValidas) {
             return back()
-                ->withErrors(['correo' => 'Correo o contraseña incorrectos.'])
-                ->withInput($request->only('correo'));
+                ->withErrors(['nombre' => 'Nombre de usuario o contraseña incorrectos.'])
+                ->withInput($request->only('nombre'));
         }
 
         $request->session()->regenerate();
@@ -75,7 +76,7 @@ class OperadorController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('operador.login');
+        return redirect()->route('login');
     }
 
     /**
@@ -84,14 +85,14 @@ class OperadorController extends Controller
     public function registrar()
     {
         if (!session()->has('operador_id')) {
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $operador = Operador::find(session('operador_id'));
 
         if (!$operador) {
             session()->forget(['operador_id', 'operador_nombre']);
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         return $this->sinCache(view('operador.registrar', compact('operador')));
@@ -111,20 +112,21 @@ class OperadorController extends Controller
     public function store(Request $request)
     {
         if (!session()->has('operador_id')) {
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $request->validate([
-            'nombre' => 'required|string|max:155',
+            'nombre' => 'required|string|max:155|unique:operador_de_be,nombre',
             'correo' => 'required|email|max:155|unique:operador_de_be,correo',
             'contraseña' => 'required|string|min:3|max:255',
         ], [
+            'nombre.unique' => 'Ya existe un operador registrado con ese nombre de usuario.',
             'correo.unique' => 'Ya existe un operador registrado con ese correo electrónico.',
         ]);
 
         $nuevoOperador = Operador::create([
-            'nombre' => $request->nombre,
-            'correo' => $request->correo,
+            'nombre' => trim($request->nombre),
+            'correo' => trim($request->correo),
             'contraseña' => $request->contraseña,
         ]);
 
@@ -139,14 +141,14 @@ class OperadorController extends Controller
     public function index(Request $request)
     {
         if (!session()->has('operador_id')) {
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $operador = Operador::find(session('operador_id'));
 
         if (!$operador) {
             session()->forget(['operador_id', 'operador_nombre']);
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $busqueda = $request->input('buscar');
@@ -182,23 +184,24 @@ class OperadorController extends Controller
     }
 
     /**
-     * Muestra todos los datos detallados de un formulario específico.
+     * Muestra todos los datos detallados de un formulario específico (incluyendo la firma del coordinador).
      */
     public function show($id)
     {
         if (!session()->has('operador_id')) {
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $operador = Operador::find(session('operador_id'));
 
         if (!$operador) {
             session()->forget(['operador_id', 'operador_nombre']);
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $formulario = Formulario::with([
             'solicitante',
+            'coordinador',
             'fechas',
             'estudiantes',
             'profesores'
@@ -214,7 +217,7 @@ class OperadorController extends Controller
     public function actualizarEstado(Request $request, $id)
     {
         if (!session()->has('operador_id')) {
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $request->validate([
@@ -252,7 +255,7 @@ class OperadorController extends Controller
     public function descargarPdf($id)
     {
         if (!session()->has('operador_id')) {
-            return redirect()->route('operador.login');
+            return redirect()->route('login');
         }
 
         $formulario = Formulario::with([
