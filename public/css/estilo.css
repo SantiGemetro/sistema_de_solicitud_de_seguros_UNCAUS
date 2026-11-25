@@ -98,6 +98,13 @@ input:disabled {
     background: #eee;
     cursor: not-allowed;
 }
+.tarjeta {
+    background-color: white;
+    border-radius: 18px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
 
 /* BUSCADOR DE MATERIAS */
 
