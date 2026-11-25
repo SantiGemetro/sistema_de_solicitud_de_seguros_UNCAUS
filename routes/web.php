@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\CoordinadorController;
 use App\Http\Controllers\OperadorController;
+use App\Http\Controllers\VerificacionCorreoController;
+use App\Http\Controllers\SolicitudController;
 
 // 1. Pantalla principal de inicio (Prueba_Pantalla_Inicial)
 Route::get('/', function () {
@@ -26,9 +28,17 @@ Route::get('/solicitud', [FormularioController::class, 'create'])->name('formula
 Route::post('/solicitar-seguro', [FormularioController::class, 'store'])->name('Formulario.store');
 Route::post('/solicitud', [FormularioController::class, 'store'])->name('formulario.store');
 
-// 4. Rutas del Operador de Bienestar Estudiantil
-Route::get('/operador/login', [AuthController::class, 'showLogin'])->name('operador.login');
-Route::post('/operador/login', [AuthController::class, 'login'])->name('operador.login.post');
+//(añadidio) rutas para verificar el correo
+Route::get('/verificar-correo/{id}/{token}',[VerificacionCorreoController::class, 'verificar'] //recibe el enlace
+)->middleware('throttle:6,1')
+ ->name('verificar.correo');
+
+Route::get('/solicitud/consultar/{token}',[SolicitudController::class, 'consultar'] //permite consultar mediante token privado
+)->name('solicitud.consultar');
+
+// 3. Rutas del Operador de Bienestar Estudiantil
+Route::get('/operador/login', [OperadorController::class, 'showLogin'])->name('operador.login');
+Route::post('/operador/login', [OperadorController::class, 'login'])->name('operador.login.post');
 Route::post('/operador/logout', [OperadorController::class, 'logout'])->name('operador.logout');
 Route::get('/operador/registrar', [OperadorController::class, 'registrar'])->name('operador.registrar');
 Route::post('/operador/registrar', [OperadorController::class, 'store'])->name('operador.store');

@@ -19,6 +19,8 @@ class Formulario extends Model
         'id_solicitante',
         'id_coordinador', //nuevo
         'estado', //nuevo
+        'estado_seguro', //estado del email
+        'token_acceso', //para consultar como solicitante no registrado
     ];
 
     public function solicitante()
